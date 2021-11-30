@@ -1,0 +1,1 @@
+enum MessageType { DEFAULT, ERROR, SUCCESS, QUESTION, WARNING }
