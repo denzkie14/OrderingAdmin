@@ -19,9 +19,13 @@ class HttpService {
   //   return Uri.encodeComponent(component);
   // }
 
-  final String rootURL = "http://192.168.1.3/";
-  final String rootURLSSL = "http://192.168.1.3/";
-  final String api = "http://192.168.1.3/api/";
+  // final String rootURL = "http://192.168.1.3/";
+  // final String rootURLSSL = "http://192.168.1.3/";
+  // final String api = "http://192.168.1.3/api/";
+
+  final String rootURL = "http://188.180.100.35/Ordering/";
+  final String rootURLSSL = "http://188.180.100.35/Ordering/";
+  final String api = "http://188.180.100.35/Ordering/api/";
 
   Future login(LoginRequest login) async {
     String url = api;

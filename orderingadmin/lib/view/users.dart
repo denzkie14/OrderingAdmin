@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:orderingadmin/controller/users_controller.dart';
+import 'package:orderingadmin/view/user_form.dart';
 
 class UsersPage extends StatelessWidget {
   // const UsersPage({ Key? key }) : super(key: key);
@@ -72,8 +73,11 @@ class UsersPage extends StatelessWidget {
                 });
           }),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.green[600],
         child: const Icon(Ionicons.add_outline),
-        onPressed: () {},
+        onPressed: () {
+          Get.to(() => UserForm());
+        },
       ),
     );
   }
