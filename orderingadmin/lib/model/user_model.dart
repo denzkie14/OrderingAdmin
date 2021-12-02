@@ -1,6 +1,9 @@
 class User {
   int? user_id;
   String? code;
+  String? username;
+  String? password;
+
   String? fname;
   String? mname;
   String? lname;
@@ -28,6 +31,8 @@ class User {
   User(
       {this.user_id,
       this.code,
+      this.username,
+      this.password,
       this.fname,
       this.mname,
       this.lname,
@@ -40,6 +45,8 @@ class User {
   User.fromJson(Map<String, dynamic> json) {
     this.user_id = json['user_id'];
     this.code = json['code'];
+    this.username = json['username'];
+    this.password = json['password'];
     this.fname = json['fname'];
     this.mname = json['mname'];
     this.lname = json['lname'];
@@ -53,6 +60,8 @@ class User {
   Map<String, dynamic> toJson() => {
         'user_id': user_id,
         'code': code,
+        'username': username,
+        'password': password,
         'fname': fname,
         'mname': mname,
         'lname': lname,

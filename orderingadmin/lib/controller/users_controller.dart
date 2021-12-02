@@ -59,11 +59,18 @@ class UsersController extends GetxController {
     update();
   }
 
-  void addUser(User user) {
+  void addUser(User user) async {
     try {
-      var request = api.addUser(user);
+      var request = await api.addUser(user);
+
+      if (request.statusCode == 200) {
+        return Future.value(true);
+      } else {
+        return Future.value(false);
+      }
     } on Exception catch (e) {
       print('Error Adding user: ' + e.toString());
+      return Future.value(false);
     }
 
     // final int index = _items.indexWhere((item) => item.id == id);

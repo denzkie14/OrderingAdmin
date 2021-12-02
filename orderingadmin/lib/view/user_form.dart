@@ -1,5 +1,9 @@
+import 'dart:convert';
+
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:orderingadmin/controller/users_controller.dart';
 import 'package:orderingadmin/model/user_model.dart';
@@ -20,10 +24,10 @@ class _UserFormState extends State<UserForm> {
   final UsersController _controller = Get.put(UsersController());
   final TextStyle style = const TextStyle(
       fontFamily: 'Montserrat', fontSize: 20.0, color: Colors.green);
-
+  final format = DateFormat("yyyy-MM-dd");
   final pref = SharedPref();
 
-  final TextEditingController cFame = TextEditingController();
+  final TextEditingController cFname = TextEditingController();
 
   final TextEditingController cMname = TextEditingController();
 
@@ -41,20 +45,20 @@ class _UserFormState extends State<UserForm> {
 
   String selectedGender = "Male";
   String selectedType = "User";
-  String selectedExt = "";
+  String selectedExt = "N/A";
   DateTime selectedDate = DateTime.now();
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
-      setState(() {
-        selectedDate = picked;
-      });
-  }
+  // Future<void> _selectDate(BuildContext context) async {
+  //   final DateTime? picked = await showDatePicker(
+  //       context: context,
+  //       initialDate: selectedDate,
+  //       firstDate: DateTime(2015, 8),
+  //       lastDate: DateTime(2101));
+  //   if (picked != null && picked != selectedDate)
+  //     setState(() {
+  //       selectedDate = picked;
+  //     });
+  // }
 
   List<DropdownMenuItem<String>> get genderItem {
     List<DropdownMenuItem<String>> menuItems = [
@@ -66,7 +70,7 @@ class _UserFormState extends State<UserForm> {
 
   List<DropdownMenuItem<String>> get extItem {
     List<DropdownMenuItem<String>> menuItems = [
-      const DropdownMenuItem(child: Text(""), value: ""),
+      const DropdownMenuItem(child: Text("Ext. Name"), value: "N/A"),
       const DropdownMenuItem(child: Text("JR."), value: "JR."),
       const DropdownMenuItem(child: Text("SR."), value: "SR."),
       const DropdownMenuItem(child: Text("III"), value: "III"),
@@ -152,7 +156,7 @@ class _UserFormState extends State<UserForm> {
                   height: 12,
                 ),
                 TextFormField(
-                  controller: cUsername,
+                  controller: cFname,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please provide First Name';
@@ -178,7 +182,7 @@ class _UserFormState extends State<UserForm> {
                   height: 12,
                 ),
                 TextFormField(
-                  controller: cUsername,
+                  controller: cMname,
                   // validator: (value) {
                   //   if (value == null || value.isEmpty) {
                   //     return 'Please your Username';
@@ -204,7 +208,7 @@ class _UserFormState extends State<UserForm> {
                   height: 12,
                 ),
                 TextFormField(
-                  controller: cUsername,
+                  controller: cLname,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please provide Last Name';
@@ -253,20 +257,26 @@ class _UserFormState extends State<UserForm> {
                 const SizedBox(
                   height: 12,
                 ),
-                Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Text("${selectedDate.toLocal()}".split(' ')[0]),
-                      const SizedBox(
-                        height: 20.0,
-                      ),
-                      ElevatedButton(
-                        onPressed: () => _selectDate(context),
-                        child: const Text('Birthday'),
-                      ),
-                    ],
+                Container(
+                  height: 55,
+                  child: InkWell(
+                    onTap: () {},
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                              DateFormat('MMMM dd, yyyy').format(selectedDate)),
+                        ),
+                      ],
+                    ),
                   ),
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.black,
+                      ),
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(50))),
                 ),
                 const SizedBox(
                   height: 12,
@@ -382,14 +392,27 @@ class _UserFormState extends State<UserForm> {
   }
 
   _addUser() async {
-    User u = User();
-    u.fname = cFame.text;
-    u.mname = cMname.text;
-    u.lname = cLname.text;
-    u.ext_name = selectedExt;
-    u.gender = selectedGender;
-    u.user_type = selectedType;
-
-    _controller.addUser(u);
+    try {
+      User u = User();
+      u.username = cUsername.text;
+      u.password = cPassword.text;
+      u.fname = cFname.text;
+      u.mname = cMname.text;
+      u.lname = cLname.text;
+      u.ext_name = selectedExt;
+      u.gender = selectedGender;
+      u.user_type = selectedType;
+      u.birthday = selectedDate;
+      print(u.toJson());
+      var response = await api.addUser(u);
+      if (response.statusCode == 200) {
+        print('Success adding user!');
+      } else {
+        var body = jsonDecode(response.body);
+        print(response.statusCode.toString() + ': ' + body);
+      }
+    } catch (e) {
+      print('Error adding user: ' + e.toString());
+    }
   }
 }

@@ -30,6 +30,7 @@ dependencies:
   animations: ^2.0.2
   carousel_slider: ^4.0.0
   cupertino_icons: ^1.0.2
+  datetime_picker_formfield: ^2.0.0
   flutter:
     sdk: flutter
   flutter_login: ^3.0.0
@@ -38,6 +39,7 @@ dependencies:
   get_storage: ^2.0.3
   google_fonts: ^2.1.0
   http: ^0.13.4
+  intl: ^0.17.0
   ionicons: ^0.1.2
   shared_preferences: ^2.0.9
 
