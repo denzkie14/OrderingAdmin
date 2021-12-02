@@ -121,4 +121,68 @@ class HttpService {
       //  return 'Error: No Network Connection...';
     }
   }
+
+  Future updateUser(User user) async {
+    String url = api;
+    String endPoint = 'User';
+    Map<String, String> headers = {
+      //   HttpHeaders.authorizationHeader: auth,
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // print(url);
+
+    try {
+      Response result = await put(Uri.parse(url + endPoint),
+          headers: headers, body: json.encode(user));
+
+      return result;
+    } on TimeoutException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: Server response timeout...';
+      // A timeout occurred.
+    } on SocketException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    } catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    }
+  }
+
+  Future removeUser(User user) async {
+    String url = api;
+    String endPoint = 'User';
+    Map<String, String> headers = {
+      //   HttpHeaders.authorizationHeader: auth,
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // print(url);
+
+    try {
+      Response result = await delete(Uri.parse(url + endPoint),
+          headers: headers, body: json.encode(user));
+
+      return result;
+    } on TimeoutException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: Server response timeout...';
+      // A timeout occurred.
+    } on SocketException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    } catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    }
+  }
 }

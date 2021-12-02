@@ -84,10 +84,27 @@ class _UserFormState extends State<UserForm> {
   List<DropdownMenuItem<String>> get userTypeItem {
     List<DropdownMenuItem<String>> menuItems = [
       const DropdownMenuItem(child: Text("User"), value: "User"),
-      const DropdownMenuItem(
-          child: Text("System Admin"), value: "System Admin"),
+      const DropdownMenuItem(child: Text("Admin"), value: "Admin"),
     ];
     return menuItems;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (widget.user != null) {
+      setState(() {
+        cUsername.text = widget.user!.username ?? "";
+        cFname.text = widget.user!.fname ?? "";
+        cMname.text = widget.user!.mname ?? "";
+        cLname.text = widget.user!.lname ?? "";
+        selectedExt = widget.user!.ext_name ?? "N/A";
+        selectedGender = widget.user!.gender ?? "";
+        selectedDate = widget.user!.birthday ?? DateTime.now();
+        selectedType = widget.user!.user_type ?? "";
+      });
+    }
   }
 
   @override
@@ -105,53 +122,55 @@ class _UserFormState extends State<UserForm> {
                 const SizedBox(
                   height: 12,
                 ),
-                TextFormField(
-                  controller: cUsername,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please provide Username';
-                    }
-                    return null;
-                  },
-                  obscureText: false,
-                  style: style,
-                  decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                      hintText: "Username",
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.green),
-                        borderRadius: BorderRadius.circular(32.0),
-                      ),
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.green),
-                        borderRadius: BorderRadius.circular(32.0),
-                      )),
-                ),
+                if (widget.user == null)
+                  TextFormField(
+                    controller: cUsername,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please provide Username';
+                      }
+                      return null;
+                    },
+                    obscureText: false,
+                    style: style,
+                    decoration: InputDecoration(
+                        contentPadding:
+                            EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                        hintText: "Username",
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.green),
+                          borderRadius: BorderRadius.circular(32.0),
+                        ),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.green),
+                          borderRadius: BorderRadius.circular(32.0),
+                        )),
+                  ),
                 const SizedBox(
                   height: 12,
                 ),
-                TextFormField(
-                  controller: cPassword,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please provide Password';
-                    }
-                    return null;
-                  },
-                  obscureText: true,
-                  style: style,
-                  decoration: InputDecoration(
-                      contentPadding:
-                          EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                      hintText: "Password",
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.green),
-                        borderRadius: BorderRadius.circular(32.0),
-                      ),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(32.0))),
-                ),
+                if (widget.user == null)
+                  TextFormField(
+                    controller: cPassword,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please provide Password';
+                      }
+                      return null;
+                    },
+                    obscureText: true,
+                    style: style,
+                    decoration: InputDecoration(
+                        contentPadding:
+                            EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                        hintText: "Password",
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.green),
+                          borderRadius: BorderRadius.circular(32.0),
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(32.0))),
+                  ),
                 const SizedBox(
                   height: 12,
                 ),
@@ -260,7 +279,18 @@ class _UserFormState extends State<UserForm> {
                 Container(
                   height: 55,
                   child: InkWell(
-                    onTap: () {},
+                    onTap: () async {
+                      final DateTime? picked = await showDatePicker(
+                          context: context,
+                          initialDate: selectedDate,
+                          firstDate: DateTime(1900, 1),
+                          lastDate: DateTime(2101));
+                      if (picked != null && picked != selectedDate) {
+                        setState(() {
+                          selectedDate = picked;
+                        });
+                      }
+                    },
                     child: Row(
                       children: [
                         Padding(
@@ -352,7 +382,11 @@ class _UserFormState extends State<UserForm> {
                           //     ],
                           //   )),
                           // );
-                          _addUser();
+                          if (widget.user == null) {
+                            _addUser();
+                          } else {
+                            _updateUser();
+                          }
                         }
                       },
                       child: Text("Save",
@@ -373,14 +407,14 @@ class _UserFormState extends State<UserForm> {
 
   buildAppBar(BuildContext context) {
     return AppBar(
-      title: Text(
+      title: const Text(
         'User Information',
         style: TextStyle(color: Colors.green),
       ),
       backgroundColor: Colors.transparent,
       elevation: 0,
       leading: IconButton(
-        icon: Icon(
+        icon: const Icon(
           Ionicons.chevron_back_outline,
           color: Colors.green,
         ),
@@ -404,9 +438,39 @@ class _UserFormState extends State<UserForm> {
       u.user_type = selectedType;
       u.birthday = selectedDate;
       print(u.toJson());
+
       var response = await api.addUser(u);
       if (response.statusCode == 200) {
         print('Success adding user!');
+        _controller.loadUser();
+      } else {
+        var body = jsonDecode(response.body);
+        print(response.statusCode.toString() + ': ' + body);
+      }
+    } catch (e) {
+      print('Error adding user: ' + e.toString());
+    }
+  }
+
+  _updateUser() async {
+    try {
+      User u = User();
+      u.user_id = widget.user!.user_id;
+      // u.username = cUsername.text;
+      // u.password = cPassword.text;
+      u.fname = cFname.text;
+      u.mname = cMname.text;
+      u.lname = cLname.text;
+      u.ext_name = selectedExt;
+      u.gender = selectedGender;
+      u.user_type = selectedType;
+      u.birthday = selectedDate;
+      print(u.toJson());
+
+      var response = await api.updateUser(u);
+      if (response.statusCode == 200) {
+        print('Success updating user!');
+        _controller.loadUser();
       } else {
         var body = jsonDecode(response.body);
         print(response.statusCode.toString() + ': ' + body);
