@@ -3,37 +3,41 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:get/get.dart';
+import 'package:orderingadmin/model/kiosk_model.dart';
 import 'package:orderingadmin/model/user_model.dart';
 import 'package:orderingadmin/service/http_service.dart';
 
-class UsersController extends GetxController {
+class KioskController extends GetxController {
   final api = HttpService();
-  var usersList = <User>[];
+  var kioskList = <Kiosk>[];
   var isLoading = false.obs;
   var errorMessage = ''.obs;
 
   @override
   void onInit() {
     // called immediately after the widget is allocated memory
-    loadUser();
+    load();
     super.onInit();
   }
 
-  List<User> get users {
-    return usersList;
+  List<Kiosk> get kiosks {
+    return kioskList;
   }
 
-  void loadUser() async {
+  void load() async {
     // isLoading.toggle();
     toggleLoading();
     try {
-      final request = await api.getUsers().timeout(const Duration(seconds: 60));
+      final request =
+          await api.getKiosks().timeout(const Duration(seconds: 60));
       var body = jsonDecode(request.body);
 
       if (request.statusCode == 200) {
-        usersList = (body as List).map((i) => User.fromJson(i)).toList();
+        kioskList = (body as List).map((i) => Kiosk.fromJson(i)).toList();
         update();
-        errorMessage.value = '';
+        if (kioskList.length == 0) {
+          errorMessage.value = 'No record found...';
+        }
       }
       if (request.statusCode == 404) {
         errorMessage.value = 'No record found...';
@@ -41,13 +45,13 @@ class UsersController extends GetxController {
     } on TimeoutException catch (e) {
       errorMessage.value =
           'Server failed to response: Please try again later...';
-      //print('Error Adding user: ' + e.toString());
+      print('Error Adding user: ' + e.toString());
     } on SocketException catch (e) {
       errorMessage.value = 'Please check your network: Please try again.';
-      //print('Error Adding user: ' + e.toString());
+      print('Error Adding user: ' + e.toString());
     } catch (e) {
       errorMessage.value = 'Please check your network: Please try again.';
-      //print('Error Adding user: ' + e.toString());
+      print('Error Adding user: ' + e.toString());
     } finally {
       // toglleLoading();
       toggleLoading();
@@ -59,9 +63,9 @@ class UsersController extends GetxController {
     update();
   }
 
-  void addUser(User user) async {
+  void add(Kiosk kiosk) async {
     try {
-      var request = await api.addUser(user);
+      var request = await api.addKiosk(kiosk);
 
       if (request.statusCode == 200) {
         return Future.value(true);

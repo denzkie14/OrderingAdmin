@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:orderingadmin/controller/hide_navigation_controller.dart';
 import 'package:orderingadmin/model/user_model.dart';
+import 'package:orderingadmin/util/alert_dialog.dart';
+import 'package:orderingadmin/util/toast_message.dart';
 import 'package:orderingadmin/view/orders.dart';
 import 'package:orderingadmin/view/wishlist.dart';
 import 'package:orderingadmin/widgets/carousel_banner.dart';
@@ -43,157 +45,180 @@ class _HomePageState extends State<HomePage> {
 
   final profilePage = Profile();
 
+  DateTime? currentBackPressTime;
+
+  Future<bool> onWillPop() {
+    DateTime now = DateTime.now();
+    if (currentBackPressTime == null ||
+        now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
+      currentBackPressTime = now;
+
+      ToastMessage.showToastMessage(
+          context, "Tap again to exit the app.", AlertMessagType.DEFAULT);
+
+      return Future.value(false);
+    }
+
+    return Future.value(true);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: ValueListenableBuilder(
-        builder: (context, bool value, child) {
-          return Scaffold(
-            // key: _key,
-            //  backgroundColor: Colors.grey[300],
-            appBar: AppBar(
-              leading: Builder(builder: (context) {
-                return IconButton(
-                  icon: Icon(Icons.sort_outlined),
-                  onPressed: () => Scaffold.of(context).openDrawer(),
-                );
-              }),
-              title: Obx(
-                () => Text(
-                  navController.selectedPageTitle.toString(),
-                  style: TextStyle(
-                      color: Colors.green, fontWeight: FontWeight.w700),
+    return WillPopScope(
+      onWillPop: onWillPop,
+      child: SafeArea(
+        child: ValueListenableBuilder(
+          builder: (context, bool value, child) {
+            return Scaffold(
+              // key: _key,
+              //  backgroundColor: Colors.grey[300],
+              appBar: AppBar(
+                leading: Builder(builder: (context) {
+                  return IconButton(
+                    icon: Icon(Icons.sort_outlined),
+                    onPressed: () => Scaffold.of(context).openDrawer(),
+                  );
+                }),
+                title: Obx(
+                  () => Text(
+                    navController.selectedPageTitle.toString(),
+                    style: TextStyle(
+                        color: Colors.green, fontWeight: FontWeight.w700),
+                  ),
                 ),
-              ),
-              backgroundColor: Colors.transparent,
-              elevation: 0.0,
-              iconTheme: CustomTheme.lightIconTheme,
-              actions: [
-                IconButton(onPressed: () {}, icon: Icon(Ionicons.cart_outline)),
-                IconButton(onPressed: () {}, icon: Icon(Ionicons.map_outline)),
-                IconButton(
-                  onPressed: () {
-                    Get.to(() => Profile(), transition: Transition.rightToLeft);
+                backgroundColor: Colors.transparent,
+                elevation: 0.0,
+                iconTheme: CustomTheme.lightIconTheme,
+                actions: [
+                  IconButton(
+                      onPressed: () {}, icon: Icon(Ionicons.cart_outline)),
+                  IconButton(
+                      onPressed: () {}, icon: Icon(Ionicons.map_outline)),
+                  IconButton(
+                    onPressed: () {
+                      Get.to(() => Profile(),
+                          transition: Transition.rightToLeft);
 
-                    //  navController.setPage(2);
-                  },
-                  icon: Hero(
-                    tag: 'avatar',
-                    child: CircleAvatar(
-                      // radius: 100,
-                      backgroundImage: AssetImage(
-                        'assets/logo.jpg',
-                        //  fit: BoxFit.cover,
+                      //  navController.setPage(2);
+                    },
+                    icon: Hero(
+                      tag: 'avatar',
+                      child: CircleAvatar(
+                        // radius: 100,
+                        backgroundImage: AssetImage(
+                          'assets/logo.jpg',
+                          //  fit: BoxFit.cover,
+                        ),
                       ),
                     ),
-                  ),
-                )
-              ],
-            ),
-            drawer: appDrawer(context),
-            body: SingleChildScrollView(
-              controller: hiding.controller,
-              physics: BouncingScrollPhysics(),
-              child: GetBuilder<BottomNavController>(builder: (controller) {
-                if (controller.selectedPage == 0) {
-                  return Notifications();
-                } else if (controller.selectedPage == 1) {
-                  return SearchPage();
-                } else if (controller.selectedPage == 2) {
-                  return Home();
-                } else if (controller.selectedPage == 3) {
-                  return Orders();
-                } else if (controller.selectedPage == 4) {
-                  return Wishlist();
-                } else {
-                  return Home();
-                }
-              }),
-            ),
-
-            bottomNavigationBar: AnimatedContainer(
-              duration: Duration(milliseconds: 250),
-              height: value ? kBottomNavigationBarHeight : 0.0,
-              child: Wrap(
-                children: <Widget>[
-                  GetBuilder<BottomNavController>(
-                      init: BottomNavController(),
-                      builder: (controller) {
-                        return BottomNavigationBar(
-                          //   elevation: 0.0,
-                          currentIndex: controller.selectedPage,
-                          selectedIconTheme: CustomTheme.lightIconTheme,
-                          //  selectedItemColor: Colors.red,
-                          unselectedItemColor: Colors.grey[600],
-
-                          showSelectedLabels: false,
-                          selectedItemColor: Colors.green,
-                          showUnselectedLabels: false,
-
-                          type: BottomNavigationBarType.fixed,
-                          items: navItems,
-                          onTap: (index) async {
-                            controller.setPage(index);
-
-                            switch (index) {
-                              case 0:
-                                break;
-                              case 1:
-                                break;
-                              case 2:
-                                break;
-                              case 3:
-                                break;
-
-                              case 4:
-                                // await Get.to(() => Profile(),
-                                //     transition: Transition.rightToLeft);
-
-                                // controller.setPage(2);
-                                break;
-                            }
-                          },
-                        );
-                      })
+                  )
                 ],
               ),
-            ),
-
-            floatingActionButton: AnimatedContainer(
-              duration: Duration(milliseconds: 250),
-              height: value ? (kBottomNavigationBarHeight - 15) : 0.0,
-              child: Wrap(
-                children: <Widget>[
-                  GetBuilder<BottomNavController>(
-                      init: BottomNavController(),
-                      builder: (controller) {
-                        return FloatingActionButton(
-                          backgroundColor: Colors.green[600],
-                          onPressed: () {
-                            controller.setPage(2);
-                            // showToast('Test Mesasge', MessageType.ERROR);
-                            //      showAlert('Test Alert', MessageType.ERROR);
-
-                            // Alert.showConfirm(
-                            //     context,
-                            //     'Test Alert',
-                            //     'This is a custom alert message ',
-                            //     MessageType.ERROR,
-                            //     cancelLabel: 'Cancel',
-                            //     confirmLabel: 'Remove');
-                          },
-                          child: Icon(Ionicons.home_outline),
-                        );
-                      })
-                ],
+              drawer: appDrawer(context),
+              body: SingleChildScrollView(
+                controller: hiding.controller,
+                physics: BouncingScrollPhysics(),
+                child: GetBuilder<BottomNavController>(builder: (controller) {
+                  if (controller.selectedPage == 0) {
+                    return Notifications();
+                  } else if (controller.selectedPage == 1) {
+                    return SearchPage();
+                  } else if (controller.selectedPage == 2) {
+                    return Home();
+                  } else if (controller.selectedPage == 3) {
+                    return Orders();
+                  } else if (controller.selectedPage == 4) {
+                    return Wishlist();
+                  } else {
+                    return Home();
+                  }
+                }),
               ),
-            ),
 
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerDocked,
-          );
-        },
-        valueListenable: hiding.visible,
+              bottomNavigationBar: AnimatedContainer(
+                duration: Duration(milliseconds: 250),
+                height: value ? kBottomNavigationBarHeight : 0.0,
+                child: Wrap(
+                  children: <Widget>[
+                    GetBuilder<BottomNavController>(
+                        init: BottomNavController(),
+                        builder: (controller) {
+                          return BottomNavigationBar(
+                            //   elevation: 0.0,
+                            currentIndex: controller.selectedPage,
+                            selectedIconTheme: CustomTheme.lightIconTheme,
+                            //  selectedItemColor: Colors.red,
+                            unselectedItemColor: Colors.grey[600],
+
+                            showSelectedLabels: false,
+                            selectedItemColor: Colors.green,
+                            showUnselectedLabels: false,
+
+                            type: BottomNavigationBarType.fixed,
+                            items: navItems,
+                            onTap: (index) async {
+                              controller.setPage(index);
+
+                              switch (index) {
+                                case 0:
+                                  break;
+                                case 1:
+                                  break;
+                                case 2:
+                                  break;
+                                case 3:
+                                  break;
+
+                                case 4:
+                                  // await Get.to(() => Profile(),
+                                  //     transition: Transition.rightToLeft);
+
+                                  // controller.setPage(2);
+                                  break;
+                              }
+                            },
+                          );
+                        })
+                  ],
+                ),
+              ),
+
+              floatingActionButton: AnimatedContainer(
+                duration: Duration(milliseconds: 250),
+                height: value ? (kBottomNavigationBarHeight - 15) : 0.0,
+                child: Wrap(
+                  children: <Widget>[
+                    GetBuilder<BottomNavController>(
+                        init: BottomNavController(),
+                        builder: (controller) {
+                          return FloatingActionButton(
+                            backgroundColor: Colors.green[600],
+                            onPressed: () {
+                              controller.setPage(2);
+                              // showToast('Test Mesasge', MessageType.ERROR);
+                              //      showAlert('Test Alert', MessageType.ERROR);
+
+                              // Alert.showConfirm(
+                              //     context,
+                              //     'Test Alert',
+                              //     'This is a custom alert message ',
+                              //     MessageType.ERROR,
+                              //     cancelLabel: 'Cancel',
+                              //     confirmLabel: 'Remove');
+                            },
+                            child: Icon(Ionicons.home_outline),
+                          );
+                        })
+                  ],
+                ),
+              ),
+
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerDocked,
+            );
+          },
+          valueListenable: hiding.visible,
+        ),
       ),
     );
   }

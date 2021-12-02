@@ -1,11 +1,21 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:orderingadmin/util/alert_dialog.dart';
+import 'package:orderingadmin/util/confirm_dialog.dart';
+import 'package:orderingadmin/util/loading_dialog.dart';
+import 'package:orderingadmin/view/Kiosk/kiosks.dart';
+import 'package:orderingadmin/view/login.dart';
 import 'package:orderingadmin/view/profile.dart';
 import 'package:orderingadmin/view/users.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 appDrawer(BuildContext context) {
   final drawerWidth = MediaQuery.of(context).size.width / 1.3;
+  final GlobalKey<State> _keyLoader = new GlobalKey<State>();
+  final GlobalKey<State> _keyConfirm = new GlobalKey<State>();
 
   return Container(
     width: drawerWidth,
@@ -14,7 +24,7 @@ appDrawer(BuildContext context) {
         children: [
           Stack(
             children: [
-              Align(
+              const Align(
                 alignment: Alignment.center,
                 child: UserAccountsDrawerHeader(
                   currentAccountPicture: CircleAvatar(
@@ -38,26 +48,26 @@ appDrawer(BuildContext context) {
                         Get.to(() => Profile(),
                             transition: Transition.rightToLeft);
                       },
-                      icon: Icon(
+                      icon: const Icon(
                         Ionicons.pencil,
                         color: Colors.white,
                       )))
             ],
           ),
           ListTile(
-            leading: Icon(
+            leading: const Icon(
               Ionicons.home_outline,
               color: Colors.green,
             ),
-            title: Text('Home'),
+            title: const Text('Home'),
             onTap: () {},
           ),
           ListTile(
-            leading: Icon(
+            leading: const Icon(
               Ionicons.notifications_outline,
               color: Colors.green,
             ),
-            title: Text('Notifications'),
+            title: const Text('Notifications'),
             onTap: () {},
           ),
           ListTile(
@@ -77,27 +87,39 @@ appDrawer(BuildContext context) {
             onTap: () {},
           ),
           ListTile(
-            leading: Icon(
+            leading: const Icon(
+              Ionicons.tablet_portrait_outline,
+              color: Colors.green,
+            ),
+            title: const Text('Kiosks'),
+            onTap: () {
+              Navigator.pop(context);
+              Get.to(() => KiosksPage(), transition: Transition.rightToLeft);
+            },
+          ),
+          ListTile(
+            leading: const Icon(
               Ionicons.person_outline,
               color: Colors.green,
             ),
-            title: Text('Users'),
+            title: const Text('Users'),
             onTap: () {
-              Get.to(() => UsersPage());
+              Navigator.pop(context);
+              Get.to(() => UsersPage(), transition: Transition.rightToLeft);
             },
           ),
           Divider(),
-          ListTile(
-            title: Text('Application Preferences'),
-          ),
-          ListTile(
-            leading: Icon(
-              Ionicons.information_circle_outline,
-              color: Colors.green,
-            ),
-            title: Text('Help & Support'),
-            onTap: () {},
-          ),
+          // ListTile(
+          //   title: Text('Application Preferences'),
+          // ),
+          // ListTile(
+          //   leading: Icon(
+          //     Ionicons.information_circle_outline,
+          //     color: Colors.green,
+          //   ),
+          //   title: Text('Help & Support'),
+          //   onTap: () {},
+          // ),
           ListTile(
             leading: Icon(
               Ionicons.settings_outline,
@@ -106,14 +128,35 @@ appDrawer(BuildContext context) {
             title: Text('Settings'),
             onTap: () {},
           ),
-          Divider(),
+          const Divider(),
           ListTile(
-            leading: Icon(
+            leading: const Icon(
               Ionicons.exit_outline,
               color: Colors.green,
             ),
-            title: Text('Logout'),
-            onTap: () {},
+            title: const Text('Logout'),
+            onTap: () async {
+              final action = await Confirm.showAlertDialog(
+                    context,
+                    _keyConfirm,
+                    'LOG OUT',
+                    'Are you sure you want to log-out your account?',
+                    AlertMessagType.QUESTION,
+                  ) ??
+                  false;
+              //  final action = await (f as FutureOr<bool>);
+              if (action) {
+                //Navigator.of(context).pop();
+                LoadingDialog.showLoadingDialog(
+                    context, _keyLoader, 'Clearing session...');
+
+                Timer(const Duration(milliseconds: 1500), () async {
+                  // Navigator.pop(
+                  //     _keyLoader.currentContext, _keyLoader);
+                  changeUser();
+                });
+              }
+            },
           ),
           ListTile(
             title: Text('Version 1.0.0'),
@@ -122,4 +165,23 @@ appDrawer(BuildContext context) {
       ),
     ),
   );
+}
+
+void changeUser() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
+  // await prefs.remove('user');
+  // await prefs.remove('establishmentName');
+  // await prefs.remove('showedDateTime');
+  // await prefs.setBool('isLoggedIn', false);
+  // Navigator.of(context).pushReplacementNamed('Login');
+
+  Get.offAll(() => LoginPage());
+  // await Provider.of<DrawerProvider>(context, listen: false)
+  //     .setSelectedPage(EstablishmentPage.Home);
+  // Navigator.of(context).pop();
+  // Navigator.pushReplacement(
+  //     context,
+  //     BouncyPageRoute(
+  //         widget: LoginPage(), animationStart: Alignment.bottomCenter));
 }

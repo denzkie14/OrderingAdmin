@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart';
+import 'package:orderingadmin/model/kiosk_model.dart';
 import 'package:orderingadmin/model/user_model.dart';
 
 enum ServerResponse {
@@ -168,6 +169,166 @@ class HttpService {
     try {
       Response result = await delete(Uri.parse(url + endPoint),
           headers: headers, body: json.encode(user));
+
+      return result;
+    } on TimeoutException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: Server response timeout...';
+      // A timeout occurred.
+    } on SocketException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    } catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    }
+  }
+
+  Future getKiosks() async {
+    String url = api;
+    String endPoint = 'Kiosk';
+    Map<String, String> headers = {
+      //   HttpHeaders.authorizationHeader: auth,
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // print(url);
+
+    try {
+      Response result = await get(Uri.parse(url + endPoint), headers: headers);
+
+      return result;
+    } on TimeoutException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: Server response timeout...';
+      // A timeout occurred.
+    } on SocketException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    } catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    }
+  }
+
+  Future addKiosk(Kiosk kiosk) async {
+    String url = api;
+    String endPoint = 'Kiosk';
+    Map<String, String> headers = {
+      //   HttpHeaders.authorizationHeader: auth,
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // print(url);
+
+    try {
+      Response result = await post(Uri.parse(url + endPoint),
+          headers: headers, body: json.encode(kiosk));
+
+      return result;
+    } on TimeoutException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: Server response timeout...';
+      // A timeout occurred.
+    } on SocketException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    } catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    }
+  }
+
+  Future updateKiosk(Kiosk kiosk) async {
+    String url = api;
+    String endPoint = 'Kiosk';
+    Map<String, String> headers = {
+      //   HttpHeaders.authorizationHeader: auth,
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // print(url);
+
+    try {
+      Response result = await put(Uri.parse(url + endPoint),
+          headers: headers, body: json.encode(kiosk));
+
+      return result;
+    } on TimeoutException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: Server response timeout...';
+      // A timeout occurred.
+    } on SocketException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    } catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    }
+  }
+
+  Future updateKioskStatus(int id, bool status) async {
+    String url = api;
+    String endPoint = 'Kiosk/Status';
+    Map<String, String> headers = {
+      //   HttpHeaders.authorizationHeader: auth,
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // print(url);
+
+    try {
+      Response result = await put(
+          Uri.parse(url + endPoint + '?id=$id&status=$status'),
+          headers: headers);
+
+      return result;
+    } on TimeoutException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: Server response timeout...';
+      // A timeout occurred.
+    } on SocketException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    } catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    }
+  }
+
+  Future removeKiosk(Kiosk kiosk) async {
+    String url = api;
+    String endPoint = 'Kiosk';
+    Map<String, String> headers = {
+      //   HttpHeaders.authorizationHeader: auth,
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // print(url);
+
+    try {
+      Response result = await delete(Uri.parse(url + endPoint),
+          headers: headers, body: json.encode(kiosk));
 
       return result;
     } on TimeoutException catch (e) {

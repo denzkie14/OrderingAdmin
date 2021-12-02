@@ -3,18 +3,21 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:orderingadmin/controller/kiosk_controller.dart';
 import 'package:orderingadmin/controller/users_controller.dart';
+import 'package:orderingadmin/model/kiosk_model.dart';
 import 'package:orderingadmin/model/user_model.dart';
 import 'package:orderingadmin/service/http_service.dart';
 import 'package:orderingadmin/util/alert_dialog.dart';
 import 'package:orderingadmin/util/confirm_dialog.dart';
 import 'package:orderingadmin/util/loading_dialog.dart';
 import 'package:orderingadmin/util/toast_message.dart';
+import 'package:orderingadmin/view/Kiosk/kiosk_form.dart';
 import 'package:orderingadmin/view/user_form.dart';
 
-class UsersPage extends StatelessWidget {
+class KiosksPage extends StatelessWidget {
   // const UsersPage({ Key? key }) : super(key: key);
-  final UsersController _controller = Get.put(UsersController());
+  final KioskController _controller = Get.put(KioskController());
   final GlobalKey<State> _keyLoader = new GlobalKey<State>();
   final GlobalKey<State> _keyConfirm = new GlobalKey<State>();
   final api = HttpService();
@@ -25,8 +28,8 @@ class UsersPage extends StatelessWidget {
     return Scaffold(
       appBar: buildAppBar(context),
       body: Center(
-        child: GetBuilder<UsersController>(
-            init: UsersController(),
+        child: GetBuilder<KioskController>(
+            init: KioskController(),
             builder: (value) {
               if (value.isLoading.value) {
                 return const Center(
@@ -36,7 +39,7 @@ class UsersPage extends StatelessWidget {
                 );
               }
 
-              if (value.usersList.isEmpty) {
+              if (value.kioskList.isEmpty) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -44,7 +47,7 @@ class UsersPage extends StatelessWidget {
                       Text(value.errorMessage.value),
                       IconButton(
                         onPressed: () {
-                          value.loadUser();
+                          value.load();
                         },
                         icon: const Icon(Ionicons.refresh_outline),
                         iconSize: Get.height / 16,
@@ -56,14 +59,14 @@ class UsersPage extends StatelessWidget {
 
               return RefreshIndicator(
                 onRefresh: () async {
-                  value.loadUser();
+                  value.load();
                   return Future.value();
                 },
                 child: Center(
                   child: ListView.builder(
-                      itemCount: value.usersList.length,
+                      itemCount: value.kioskList.length,
                       itemBuilder: (context, index) {
-                        final user = value.usersList.elementAt(index);
+                        final kiosk = value.kioskList.elementAt(index);
 
                         return Padding(
                           padding: const EdgeInsets.only(left: 8.0, right: 8.0),
@@ -71,14 +74,14 @@ class UsersPage extends StatelessWidget {
                             elevation: 10,
                             child: ListTile(
                               onTap: () {},
-                              title: Text(user.fname ?? ''),
-                              subtitle: Text(user.user_type ?? ''),
+                              title: Text(kiosk.kiosk_desc ?? ''),
+                              subtitle: Text(kiosk.kiosk_type ?? ''),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
                                       onPressed: () {
-                                        Get.to(() => UserForm(user: user));
+                                        Get.to(() => KioskForm(kiosk: kiosk));
                                       },
                                       color: Colors.green,
                                       icon:
@@ -91,12 +94,12 @@ class UsersPage extends StatelessWidget {
                                                   context,
                                                   _keyConfirm,
                                                   'Delete',
-                                                  'Are you sure you want delete the selected record?',
+                                                  'Are you sure you want delete the selected item?',
                                                   AlertMessagType.QUESTION,
                                                 ) ??
                                                 false;
                                         if (action) {
-                                          _removeUser(context, user);
+                                          _remove(context, kiosk);
                                         }
                                       },
                                       icon: const Icon(Ionicons.trash_outline))
@@ -114,7 +117,7 @@ class UsersPage extends StatelessWidget {
         backgroundColor: Colors.green[600],
         child: const Icon(Ionicons.add_outline),
         onPressed: () {
-          Get.to(() => UserForm());
+          Get.to(() => KioskForm());
         },
       ),
     );
@@ -123,7 +126,7 @@ class UsersPage extends StatelessWidget {
   buildAppBar(BuildContext context) {
     return AppBar(
       title: const Text(
-        'Users',
+        'Kiosk',
         style: TextStyle(color: Colors.green),
       ),
       backgroundColor: Colors.transparent,
@@ -140,19 +143,20 @@ class UsersPage extends StatelessWidget {
     );
   }
 
-  _removeUser(BuildContext context, User user) async {
+  _remove(BuildContext context, Kiosk kiosk) async {
     LoadingDialog.showLoadingDialog(context, _keyLoader, 'Please wait...');
     try {
-      var response = await api.removeUser(user);
+      var response = await api.removeKiosk(kiosk);
       if (response.statusCode == 200) {
-        print('Success deleting user!');
+        print('Success deleting kiosk!');
         ToastMessage.showToastMessage(
-            context, "Record deleted.", AlertMessagType.DEFAULT);
-        _controller.loadUser();
+            context, "Item deleted.", AlertMessagType.DEFAULT);
+        _controller.load();
       } else {
         var body = jsonDecode(response.body);
         ToastMessage.showToastMessage(context,
             "Failed to delete, please try again.", AlertMessagType.DEFAULT);
+        print(response.statusCode.toString() + ': ' + body);
         print(response.statusCode.toString() + ': ' + body);
       }
     } catch (e) {
@@ -160,7 +164,7 @@ class UsersPage extends StatelessWidget {
           context,
           "Error occured: please check your network and try again.",
           AlertMessagType.DEFAULT);
-      print('Error adding user: ' + e.toString());
+      print('Error adding kiosk: ' + e.toString());
     } finally {
       Navigator.pop(_keyLoader.currentContext!, _keyLoader);
     }

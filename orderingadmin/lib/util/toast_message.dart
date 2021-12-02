@@ -1,34 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'alert_dialog.dart';
 
-import '../constants.dart';
+class ToastMessage {
+  static Future<bool?> showToastMessage(
+      BuildContext context, String msg, AlertMessagType type) {
+    Color? color;
+    switch (type) {
+      case AlertMessagType.INFO:
+        color = Colors.lightBlue[700];
+        break;
+      case AlertMessagType.ERROR:
+        color = Colors.red[700];
+        break;
+      case AlertMessagType.WARNING:
+        color = Colors.orange[700];
+        break;
+      case AlertMessagType.QUESTION:
+        color = Colors.lightBlue[700];
+        break;
+      case AlertMessagType.SUCCESS:
+        color = Colors.green[700];
+        break;
+      case AlertMessagType.DEFAULT:
+        color = Colors.grey.withOpacity(0.9);
+        break;
+    }
 
-showToast(String message, MessageType type) {
-  // Color? _color = Colors.green[400];
-  // switch (type) {
-  //   case MessageType.DEFAULT:
-  //     _color = Colors.green[400];
-  //     break;
-  //   case MessageType.ERROR:
-  //     _color = Colors.red;
-  //     break;
-  //   case MessageType.SUCCESS:
-  //     _color = Colors.green;
-  //     break;
-  //   case MessageType.QUESTION:
-  //     _color = Colors.lightBlue;
-  //     break;
-  //   case MessageType.WARNING:
-  //     _color = Colors.lightBlue;
-  //     break;
-  // }
-
-  Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      // backgroundColor: Colors.red,
-      //  textColor: type == MessageType.DEFAULT ? Colors.black : Colors.white,
-      fontSize: 16.0);
+    return Fluttertoast.showToast(
+        msg: msg,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
 }

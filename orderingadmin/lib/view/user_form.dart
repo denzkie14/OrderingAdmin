@@ -8,7 +8,11 @@ import 'package:ionicons/ionicons.dart';
 import 'package:orderingadmin/controller/users_controller.dart';
 import 'package:orderingadmin/model/user_model.dart';
 import 'package:orderingadmin/service/http_service.dart';
+import 'package:orderingadmin/util/alert_dialog.dart';
+import 'package:orderingadmin/util/confirm_dialog.dart';
+import 'package:orderingadmin/util/loading_dialog.dart';
 import 'package:orderingadmin/util/prefs.dart';
+import 'package:orderingadmin/util/toast_message.dart';
 
 class UserForm extends StatefulWidget {
   // const UserForm({ Key? key }) : super(key: key);
@@ -20,10 +24,12 @@ class UserForm extends StatefulWidget {
 }
 
 class _UserFormState extends State<UserForm> {
+  final GlobalKey<State> _keyLoader = new GlobalKey<State>();
+  final GlobalKey<State> _keyConfirm = new GlobalKey<State>();
   final api = HttpService();
   final UsersController _controller = Get.put(UsersController());
   final TextStyle style = const TextStyle(
-      fontFamily: 'Montserrat', fontSize: 20.0, color: Colors.green);
+      fontFamily: 'Montserrat', fontSize: 20.0, color: Colors.black);
   final format = DateFormat("yyyy-MM-dd");
   final pref = SharedPref();
 
@@ -134,9 +140,13 @@ class _UserFormState extends State<UserForm> {
                     obscureText: false,
                     style: style,
                     decoration: InputDecoration(
+                        floatingLabelBehavior: FloatingLabelBehavior.auto,
+                        label: const Text(
+                          "Username",
+                          style: TextStyle(color: Colors.green),
+                        ),
                         contentPadding:
                             EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                        hintText: "Username",
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.green),
                           borderRadius: BorderRadius.circular(32.0),
@@ -163,7 +173,11 @@ class _UserFormState extends State<UserForm> {
                     decoration: InputDecoration(
                         contentPadding:
                             EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                        hintText: "Password",
+                        floatingLabelBehavior: FloatingLabelBehavior.auto,
+                        label: const Text(
+                          "Password",
+                          style: TextStyle(color: Colors.green),
+                        ),
                         focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(color: Colors.green),
                           borderRadius: BorderRadius.circular(32.0),
@@ -187,7 +201,11 @@ class _UserFormState extends State<UserForm> {
                   decoration: InputDecoration(
                       contentPadding:
                           EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                      hintText: "First Name",
+                      floatingLabelBehavior: FloatingLabelBehavior.auto,
+                      label: const Text(
+                        "First Name",
+                        style: TextStyle(color: Colors.green),
+                      ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.green),
                         borderRadius: BorderRadius.circular(32.0),
@@ -213,7 +231,11 @@ class _UserFormState extends State<UserForm> {
                   decoration: InputDecoration(
                       contentPadding:
                           EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                      hintText: "Middle Name",
+                      floatingLabelBehavior: FloatingLabelBehavior.auto,
+                      label: const Text(
+                        "Middle Name",
+                        style: TextStyle(color: Colors.green),
+                      ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.green),
                         borderRadius: BorderRadius.circular(32.0),
@@ -239,7 +261,11 @@ class _UserFormState extends State<UserForm> {
                   decoration: InputDecoration(
                       contentPadding:
                           EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                      hintText: "Last Name",
+                      floatingLabelBehavior: FloatingLabelBehavior.auto,
+                      label: const Text(
+                        "Last Name",
+                        style: TextStyle(color: Colors.green),
+                      ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.green),
                         borderRadius: BorderRadius.circular(32.0),
@@ -254,6 +280,12 @@ class _UserFormState extends State<UserForm> {
                 ),
                 DropdownButtonFormField(
                     decoration: InputDecoration(
+                      floatingLabelBehavior: FloatingLabelBehavior.auto,
+
+                      label: const Text(
+                        "Ext. Name",
+                        style: TextStyle(color: Colors.green),
+                      ),
                       enabledBorder: OutlineInputBorder(
                         // borderSide: BorderSide(color: Colors.blue, width: 2),
                         borderRadius: BorderRadius.circular(50),
@@ -313,6 +345,12 @@ class _UserFormState extends State<UserForm> {
                 ),
                 DropdownButtonFormField(
                     decoration: InputDecoration(
+                      floatingLabelBehavior: FloatingLabelBehavior.auto,
+
+                      label: const Text(
+                        "Gender",
+                        style: TextStyle(color: Colors.green),
+                      ),
                       enabledBorder: OutlineInputBorder(
                         // borderSide: BorderSide(color: Colors.blue, width: 2),
                         borderRadius: BorderRadius.circular(50),
@@ -337,6 +375,12 @@ class _UserFormState extends State<UserForm> {
                 ),
                 DropdownButtonFormField(
                     decoration: InputDecoration(
+                      floatingLabelBehavior: FloatingLabelBehavior.auto,
+
+                      label: const Text(
+                        "User Type",
+                        style: TextStyle(color: Colors.green),
+                      ),
                       enabledBorder: OutlineInputBorder(
                         //    borderSide: BorderSide(color: Colors.green, width: 1),
                         borderRadius: BorderRadius.circular(50),
@@ -368,7 +412,7 @@ class _UserFormState extends State<UserForm> {
                       minWidth: MediaQuery.of(context).size.width,
                       padding:
                           const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           // If the form is valid, display a snackbar. In the real world,
                           // you'd often call a server or save the information in a database.
@@ -383,9 +427,31 @@ class _UserFormState extends State<UserForm> {
                           //   )),
                           // );
                           if (widget.user == null) {
-                            _addUser();
+                            final action = await Confirm.showAlertDialog(
+                                  context,
+                                  _keyConfirm,
+                                  'Add',
+                                  'Save new record?',
+                                  AlertMessagType.QUESTION,
+                                ) ??
+                                false;
+                            if (action) {
+                              _addUser();
+                              Get.back();
+                            }
                           } else {
-                            _updateUser();
+                            final action = await Confirm.showAlertDialog(
+                                  context,
+                                  _keyConfirm,
+                                  'Update',
+                                  'Save changes made for this item?',
+                                  AlertMessagType.QUESTION,
+                                ) ??
+                                false;
+                            if (action) {
+                              await _updateUser();
+                              Get.back();
+                            }
                           }
                         }
                       },
@@ -426,6 +492,7 @@ class _UserFormState extends State<UserForm> {
   }
 
   _addUser() async {
+    LoadingDialog.showLoadingDialog(context, _keyLoader, 'Please wait...');
     try {
       User u = User();
       u.username = cUsername.text;
@@ -442,17 +509,28 @@ class _UserFormState extends State<UserForm> {
       var response = await api.addUser(u);
       if (response.statusCode == 200) {
         print('Success adding user!');
+        ToastMessage.showToastMessage(
+            context, "Record added.", AlertMessagType.DEFAULT);
         _controller.loadUser();
       } else {
         var body = jsonDecode(response.body);
+        ToastMessage.showToastMessage(context,
+            "Failed to add, please try again.", AlertMessagType.DEFAULT);
         print(response.statusCode.toString() + ': ' + body);
       }
     } catch (e) {
+      ToastMessage.showToastMessage(
+          context,
+          "Error occured: please check your network and try again.",
+          AlertMessagType.DEFAULT);
       print('Error adding user: ' + e.toString());
+    } finally {
+      Navigator.pop(_keyLoader.currentContext!, _keyLoader);
     }
   }
 
   _updateUser() async {
+    LoadingDialog.showLoadingDialog(context, _keyLoader, 'Please wait...');
     try {
       User u = User();
       u.user_id = widget.user!.user_id;
@@ -470,13 +548,23 @@ class _UserFormState extends State<UserForm> {
       var response = await api.updateUser(u);
       if (response.statusCode == 200) {
         print('Success updating user!');
+        ToastMessage.showToastMessage(
+            context, "Record updated.", AlertMessagType.DEFAULT);
         _controller.loadUser();
       } else {
         var body = jsonDecode(response.body);
+        ToastMessage.showToastMessage(context,
+            "Failed to delete, please try again.", AlertMessagType.DEFAULT);
         print(response.statusCode.toString() + ': ' + body);
       }
     } catch (e) {
+      ToastMessage.showToastMessage(
+          context,
+          "Error occured: please check your network and try again.",
+          AlertMessagType.DEFAULT);
       print('Error adding user: ' + e.toString());
+    } finally {
+      Navigator.pop(_keyLoader.currentContext!, _keyLoader);
     }
   }
 }
