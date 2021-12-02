@@ -6,6 +6,7 @@ import 'package:ionicons/ionicons.dart';
 import 'package:orderingadmin/util/alert_dialog.dart';
 import 'package:orderingadmin/util/confirm_dialog.dart';
 import 'package:orderingadmin/util/loading_dialog.dart';
+import 'package:orderingadmin/view/Category/categories.dart';
 import 'package:orderingadmin/view/Kiosk/kiosks.dart';
 import 'package:orderingadmin/view/login.dart';
 import 'package:orderingadmin/view/profile.dart';
@@ -85,6 +86,18 @@ appDrawer(BuildContext context) {
             ),
             title: Text('Wishlist'),
             onTap: () {},
+          ),
+          ListTile(
+            leading: const Icon(
+              Ionicons.apps_outline,
+              color: Colors.green,
+            ),
+            title: const Text('Categories'),
+            onTap: () {
+              Navigator.pop(context);
+              Get.to(() => CategoriesPage(),
+                  transition: Transition.rightToLeft);
+            },
           ),
           ListTile(
             leading: const Icon(
