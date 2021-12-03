@@ -8,6 +8,7 @@ import 'package:orderingadmin/util/confirm_dialog.dart';
 import 'package:orderingadmin/util/loading_dialog.dart';
 import 'package:orderingadmin/view/Category/categories.dart';
 import 'package:orderingadmin/view/Kiosk/kiosks.dart';
+import 'package:orderingadmin/view/Product/products.dart';
 import 'package:orderingadmin/view/login.dart';
 import 'package:orderingadmin/view/profile.dart';
 import 'package:orderingadmin/view/users.dart';
@@ -81,11 +82,14 @@ appDrawer(BuildContext context) {
           ),
           ListTile(
             leading: Icon(
-              Ionicons.heart_outline,
+              Ionicons.basket_outline,
               color: Colors.green,
             ),
-            title: Text('Wishlist'),
-            onTap: () {},
+            title: const Text('Products'),
+            onTap: () {
+              Navigator.pop(context);
+              Get.to(() => ProductsPage(), transition: Transition.rightToLeft);
+            },
           ),
           ListTile(
             leading: const Icon(
