@@ -474,4 +474,45 @@ class HttpService {
       //  return 'Error: No Network Connection...';
     }
   }
+
+  // Future uploadPhoto(ProjectImage projectImage) async {
+  //   String endPoint = 'ProjectImage';
+
+  //   final username = await sharedPref.read('username');
+  //   final password = await sharedPref.read('password');
+
+  //   String secret = "$username:$password";
+  //   var bytes = utf8.encode(secret);
+  //   var auth = 'Basic ' + base64.encode(bytes);
+
+  //   try {
+  //     Response request = await post(url + endPoint,
+  //         headers: {
+  //           HttpHeaders.authorizationHeader: auth,
+  //           'Content-type': 'application/json',
+  //           'Accept': 'application/json',
+  //         },
+  //         body: jsonEncode(projectImage));
+
+  //     //  .timeout(Duration(seconds: 30), onTimeout: () => _onTimeout());
+  //     print(request.body);
+  //     return request;
+  //   } on SocketException catch (e) {
+  //     print(e.toString());
+  //     return Future.value();
+  //     //  return 'Error: No Network Connection...';
+  //   } on TimeoutException catch (e) {
+  //     print(e.toString());
+  //     return Future.value();
+  //     //  return 'Error: Server response timeout...';
+  //     // A timeout occurred.
+  //   } on NoSuchMethodError catch (e) {
+  //     print(e.toString());
+  //     return Future.value();
+  //   } on Exception catch (e) {
+  //     print(e.toString());
+  //     return Future.value();
+  //   }
+  // }
+
 }

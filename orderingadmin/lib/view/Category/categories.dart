@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
@@ -74,42 +75,138 @@ class CategoriesPage extends StatelessWidget {
                         return Padding(
                           padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                           child: Card(
-                            elevation: 10,
-                            child: ListTile(
-                              onTap: () {},
-                              title: Text(category.category_desc ?? ''),
-                              //  subtitle: Text(category.kiosk_type ?? ''),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
                                 children: [
-                                  IconButton(
-                                      onPressed: () {
-                                        Get.to(() =>
-                                            CategoryForm(category: category));
-                                      },
-                                      color: Colors.green,
-                                      icon:
-                                          const Icon(Ionicons.pencil_outline)),
-                                  IconButton(
-                                      color: Colors.red,
-                                      onPressed: () async {
-                                        final action =
-                                            await Confirm.showAlertDialog(
-                                                  context,
-                                                  _keyConfirm,
-                                                  'Delete',
-                                                  'Are you sure you want delete the selected item?',
-                                                  AlertMessagType.QUESTION,
-                                                ) ??
-                                                false;
-                                        if (action) {
-                                          _remove(context, category);
-                                        }
-                                      },
-                                      icon: const Icon(Ionicons.trash_outline))
+                                  CachedNetworkImage(
+                                    imageUrl:
+                                        '${api.api}Category/Image/${category.category_id}',
+                                    imageBuilder: (context, imageProvider) =>
+                                        Container(
+                                      width: 95.0,
+                                      height: 95.0,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                            image: imageProvider,
+                                            fit: BoxFit.cover),
+                                      ),
+                                    ),
+                                    placeholder: (context, url) =>
+                                        const CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.green),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      category.category_desc ?? '',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      IconButton(
+                                          onPressed: () {
+                                            Get.to(() => CategoryForm(
+                                                category: category));
+                                          },
+                                          color: Colors.green,
+                                          icon: const Icon(
+                                              Ionicons.pencil_outline)),
+                                      IconButton(
+                                          color: Colors.red,
+                                          onPressed: () async {
+                                            final action =
+                                                await Confirm.showAlertDialog(
+                                                      context,
+                                                      _keyConfirm,
+                                                      'Delete',
+                                                      'Are you sure you want delete the selected item?',
+                                                      AlertMessagType.QUESTION,
+                                                    ) ??
+                                                    false;
+                                            if (action) {
+                                              _remove(context, category);
+                                            }
+                                          },
+                                          icon: const Icon(
+                                              Ionicons.trash_outline))
+                                    ],
+                                  )
                                 ],
                               ),
                             ),
+                            elevation: 10,
+                            // child: ListTile(
+                            //   onTap: () {},
+                            //   leading: CircleAvatar(
+                            //     radius: 80,
+                            //     child: CachedNetworkImage(
+                            //       imageUrl:
+                            //           '${api.api}Category/Image/${category.category_id}',
+                            //       imageBuilder: (context, imageProvider) =>
+                            //           Container(
+                            //         width: 80.0,
+                            //         height: 80.0,
+                            //         decoration: BoxDecoration(
+                            //           shape: BoxShape.circle,
+                            //           image: DecorationImage(
+                            //               image: imageProvider,
+                            //               fit: BoxFit.cover),
+                            //         ),
+                            //       ),
+                            //       placeholder: (context, url) =>
+                            //           const CircularProgressIndicator(
+                            //         valueColor: AlwaysStoppedAnimation<Color>(
+                            //             Colors.green),
+                            //       ),
+                            //       errorWidget: (context, url, error) =>
+                            //           const Icon(Icons.error),
+                            //     ),
+                            //   ),
+                            //   title: Text(category.category_desc ?? ''),
+                            //   //  subtitle: Text(category.kiosk_type ?? ''),
+                            //   trailing: Row(
+                            //     mainAxisSize: MainAxisSize.min,
+                            //     children: [
+                            //       IconButton(
+                            //           onPressed: () {
+                            //             Get.to(() =>
+                            //                 CategoryForm(category: category));
+                            //           },
+                            //           color: Colors.green,
+                            //           icon:
+                            //               const Icon(Ionicons.pencil_outline)),
+                            //       IconButton(
+                            //           color: Colors.red,
+                            //           onPressed: () async {
+                            //             final action =
+                            //                 await Confirm.showAlertDialog(
+                            //                       context,
+                            //                       _keyConfirm,
+                            //                       'Delete',
+                            //                       'Are you sure you want delete the selected item?',
+                            //                       AlertMessagType.QUESTION,
+                            //                     ) ??
+                            //                     false;
+                            //             if (action) {
+                            //               _remove(context, category);
+                            //             }
+                            //           },
+                            //           icon: const Icon(Ionicons.trash_outline))
+                            //     ],
+                            //   ),
+                            // ),
                           ),
                         );
                       }),

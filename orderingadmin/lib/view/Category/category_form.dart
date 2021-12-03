@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:http/retry.dart';
 import 'package:intl/intl.dart';
@@ -103,6 +105,23 @@ class _CategoryFormState extends State<CategoryForm> {
   }
 
   Widget buildGridView() {
+    if (widget.category != null && images.isEmpty) {
+      return CachedNetworkImage(
+        imageUrl: '${api.api}Category/Image/${widget.category!.category_id}',
+        imageBuilder: (context, imageProvider) => Container(
+          width: 300.0,
+          height: 300.0,
+          decoration: BoxDecoration(
+            //   shape: BoxShape.circle,
+            image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+          ),
+        ),
+        placeholder: (context, url) => const CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+        ),
+        errorWidget: (context, url, error) => const Icon(Icons.error),
+      );
+    }
     if (images.isEmpty) {
       return Container(
         height: 300,
@@ -198,6 +217,12 @@ class _CategoryFormState extends State<CategoryForm> {
                       padding:
                           const EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
                       onPressed: () async {
+                        if (images.isEmpty && widget.category == null) {
+                          ToastMessage.showToastMessage(context,
+                              "Please select Image", AlertMessagType.DEFAULT);
+                          return;
+                        }
+
                         if (_formKey.currentState!.validate()) {
                           // If the form is valid, display a snackbar. In the real world,
                           // you'd often call a server or save the information in a database.
@@ -279,30 +304,33 @@ class _CategoryFormState extends State<CategoryForm> {
   _add() async {
     LoadingDialog.showLoadingDialog(context, _keyLoader, 'Please wait...');
     try {
-      User _user = User.fromJson(await pref.read('user'));
-      Category u = Category();
-      //     u.kiosk_id = widget.kiosk!.kiosk_id;
-      // u.username = cUsername.text;
-      // u.password = cPassword.text;
-      u.category_desc = cDesc.text;
-      // u.kiosk_type = selectedType;
-      // u.createdBy = _user.user_id;
-      // u.isUsed = false;
-      u.isDeleted = false;
-      print(u.toJson());
+      for (Asset asset in images) {
+        var byteData = await asset.getByteData(quality: 25);
+        List<int> _imageData = byteData.buffer.asUint8List();
 
-      var response = await api.addCategory(u);
-      if (response.statusCode == 200) {
-        print('Success adding Category!');
+        var base64Image = base64Encode(_imageData);
 
-        ToastMessage.showToastMessage(
-            context, "Item added.", AlertMessagType.DEFAULT);
-        _controller.load();
-      } else {
-        var body = jsonDecode(response.body);
-        ToastMessage.showToastMessage(context,
-            "Failed to add, please try again.", AlertMessagType.DEFAULT);
-        print(response.statusCode.toString() + ': ' + body);
+        //     User _user = User.fromJson(await pref.read('user'));
+        Category u = Category();
+
+        u.category_desc = cDesc.text;
+        u.image = base64Image;
+        u.isDeleted = false;
+        // print(u.toJson());
+
+        var response = await api.addCategory(u);
+        if (response.statusCode == 200) {
+          print('Success adding Category!');
+
+          ToastMessage.showToastMessage(
+              context, "Item added.", AlertMessagType.DEFAULT);
+          _controller.load();
+        } else {
+          var body = jsonDecode(response.body);
+          ToastMessage.showToastMessage(context,
+              "Failed to add, please try again.", AlertMessagType.DEFAULT);
+          print(response.statusCode.toString() + ': ' + body);
+        }
       }
     } catch (e) {
       ToastMessage.showToastMessage(
@@ -318,21 +346,28 @@ class _CategoryFormState extends State<CategoryForm> {
   _update() async {
     LoadingDialog.showLoadingDialog(context, _keyLoader, 'Please wait...');
     try {
+      ByteData byteData;
+      List<int> _imageData;
+      String? base64Image;
+      for (Asset asset in images) {
+        byteData = await asset.getByteData(quality: 25);
+        _imageData = byteData.buffer.asUint8List();
+        base64Image = base64Encode(_imageData);
+      }
+
       User _user = User.fromJson(await pref.read('user'));
       Category u = Category();
       u.category_id = widget.category!.category_id;
-      // u.username = cUsername.text;
-      // u.password = cPassword.text;
       u.category_desc = cDesc.text;
-      //  u.kiosk_type = selectedType;
-      // u.createdBy = _user.user_id;
-      // u.isUsed = false;
-      // u.isDeleted = false;
-      print(u.toJson());
+      u.image = base64Image ?? "";
+      u.isDeleted = false;
+      // print(u.toJson());
 
       var response = await api.updateCategory(u);
       if (response.statusCode == 200) {
         print('Success updating Category!');
+        CachedNetworkImage.evictFromCache(
+            '${api.api}Category/Image/${u.category_id}');
         ToastMessage.showToastMessage(
             context, "Item updated.", AlertMessagType.DEFAULT);
         _controller.load();
@@ -352,4 +387,61 @@ class _CategoryFormState extends State<CategoryForm> {
       Navigator.pop(_keyLoader.currentContext!, _keyLoader);
     }
   }
+
+  // uploadImage() async {
+  //   ToastMessage.showToastMessage(
+  //       context, 'Uploading photos...', AlertMessagType.INFO);
+
+  //   try {
+  //     for (Asset asset in images) {
+  //       print('identifier: ${asset.identifier}');
+  //       // var path = await FlutterAbsolutePath.getAbsolutePath(_asset.identifier);
+  //       var byteData = await asset.getByteData(quality: 25);
+  //       List<int> _imageData = byteData.buffer.asUint8List();
+  //       //   var file = await getImageFileFromAsset(byteData.);
+  //       var base64Image = base64Encode(_imageData);
+
+  //       ProjectImage pm = ProjectImage();
+  //       pm.imageBase64 = base64Image;
+  //       pm.projectId = widget.project.projectId;
+
+  //       Response result = await server.uploadPhoto(pm);
+  //       if (result.statusCode == 200) {
+  //         ToastMessage.showToastMessage(
+  //             context, result.body, AlertMessagType.SUCCESS);
+  //         Navigator.of(context).pop();
+  //       } else {
+  //         ToastMessage.showToastMessage(
+  //             context, result.body, AlertMessagType.ERROR);
+  //       }
+  //     }
+  //     ToastMessage.showToastMessage(
+  //         context, 'Done uploading photos.', AlertMessagType.INFO);
+  //   } on SocketException catch (e) {
+  //     print(e.toString());
+  //     ToastMessage.showToastMessage(
+  //         context, e.toString(), AlertMessagType.INFO);
+  //     return Future.value();
+  //     //  return 'Error: No Network Connection...';
+  //   } on TimeoutException catch (e) {
+  //     print(e.toString());
+  //     ToastMessage.showToastMessage(
+  //         context, e.toString(), AlertMessagType.INFO);
+  //     return Future.value();
+  //     //  return 'Error: Server response timeout...';
+  //     // A timeout occurred.
+  //   } on NoSuchMethodError catch (e) {
+  //     print(e.toString());
+  //     ToastMessage.showToastMessage(
+  //         context, e.toString(), AlertMessagType.INFO);
+  //     return Future.value();
+  //   } on Exception catch (e) {
+  //     print(e.toString());
+  //     ToastMessage.showToastMessage(
+  //         context, e.toString(), AlertMessagType.INFO);
+  //     return Future.value();
+  //   }
+
+  //   // Navigator.of(context).pop();
+  // }
 }
