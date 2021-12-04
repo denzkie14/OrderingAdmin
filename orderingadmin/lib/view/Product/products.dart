@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:orderingadmin/controller/product_controller.dart';
 import 'package:orderingadmin/model/product_model.dart';
@@ -20,6 +21,8 @@ class ProductsPage extends StatelessWidget {
   final GlobalKey<State> _keyLoader = new GlobalKey<State>();
   final GlobalKey<State> _keyConfirm = new GlobalKey<State>();
   final api = HttpService();
+  var formatter = NumberFormat('#,###,000.00');
+
   @override
   Widget build(BuildContext context) {
     // _controller.loadUser();
@@ -98,11 +101,34 @@ class ProductsPage extends StatelessWidget {
                                     width: 10,
                                   ),
                                   Expanded(
-                                    child: Text(
-                                      product.title ?? '',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          product.title ?? '',
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16),
+                                        ),
+                                        Text(
+                                          product.item_desc ?? '',
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 16),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              formatter.format(
+                                                  product.price),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 16),
+                                            ),
+                                          ],
+                                        )
+                                      ],
                                     ),
                                   ),
                                   Row(
