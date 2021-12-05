@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -25,6 +26,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late FirebaseMessaging messaging;
+
   final HideNavbar hiding = HideNavbar();
 
   final navController = Get.put(BottomNavController());
@@ -60,6 +63,25 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Future.value(true);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    messaging = FirebaseMessaging.instance;
+    messaging.getToken().then((value) {
+      print(value);
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage event) {
+      print("message recieved");
+      print(event.notification!.body);
+      // add code to refresh order list
+    });
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      print('Message clicked!');
+      // add code to refresh order list
+    });
   }
 
   @override

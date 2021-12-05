@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "447036771741",
+    "project_id": "ordering-pos",
+    "storage_bucket": "ordering-pos.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447036771741:android:3bc03274baaee91ad37374",
+        "android_client_info": {
+          "package_name": "com.technopure.orderingadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "447036771741-jf98uk75i5nkfnq6iiedvhpnqq8nt0hf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDt2HygX4ZIa2rqOVd339siMTIecq_01bE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "447036771741-jf98uk75i5nkfnq6iiedvhpnqq8nt0hf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
