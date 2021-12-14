@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +8,9 @@ import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:orderingadmin/controller/hide_navigation_controller.dart';
 import 'package:orderingadmin/model/user_model.dart';
+import 'package:orderingadmin/service/http_service.dart';
 import 'package:orderingadmin/util/alert_dialog.dart';
+import 'package:orderingadmin/util/prefs.dart';
 import 'package:orderingadmin/util/toast_message.dart';
 import 'package:orderingadmin/view/orders.dart';
 import 'package:orderingadmin/view/wishlist.dart';
@@ -29,7 +33,7 @@ class _HomePageState extends State<HomePage> {
   late FirebaseMessaging messaging;
 
   final HideNavbar hiding = HideNavbar();
-
+  final api = HttpService();
   final navController = Get.put(BottomNavController());
   final List<BottomNavigationBarItem> navItems = [
     BottomNavigationBarItem(
@@ -71,6 +75,7 @@ class _HomePageState extends State<HomePage> {
     messaging = FirebaseMessaging.instance;
     messaging.getToken().then((value) {
       print(value);
+      saveToken(value ?? '');
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage event) {
@@ -82,6 +87,25 @@ class _HomePageState extends State<HomePage> {
       print('Message clicked!');
       // add code to refresh order list
     });
+  }
+
+  saveToken(String token) async {
+    try {
+      if (token.isNotEmpty) {
+        final pref = SharedPref();
+        User _user = User.fromJson(await pref.read('user'));
+        _user.token = token;
+        var request = await api.updateToken(_user);
+        var body = jsonDecode(request.body);
+        if (request.statusCode == 200) {
+          print('User Token Updated');
+        } else {
+          print('Error: SaveToken - ${request.statusCode} ${request.body}');
+        }
+      }
+    } catch (e) {
+      print('Error: SaveToken - ${e.toString()} ');
+    }
   }
 
   @override

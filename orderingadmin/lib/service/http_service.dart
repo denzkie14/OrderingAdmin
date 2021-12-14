@@ -22,13 +22,13 @@ class HttpService {
   //   return Uri.encodeComponent(component);
   // }
 
-  final String rootURL = "http://192.168.1.3/";
-  final String rootURLSSL = "http://192.168.1.3/";
-  final String api = "http://192.168.1.3/api/";
+  // final String rootURL = "http://192.168.1.3/";
+  // final String rootURLSSL = "http://192.168.1.3/";
+  // final String api = "http://192.168.1.3/api/";
 
-  // final String rootURL = "http://188.180.100.35/Ordering/";
-  // final String rootURLSSL = "http://188.180.100.35/Ordering/";
-  // final String api = "http://188.180.100.35/Ordering/api/";
+  final String rootURL = "http://188.180.100.35/Ordering/";
+  final String rootURLSSL = "http://188.180.100.35/Ordering/";
+  final String api = "http://188.180.100.35/Ordering/api/";
 
   Future login(LoginRequest login) async {
     String url = api;
@@ -138,6 +138,38 @@ class HttpService {
 
     try {
       Response result = await put(Uri.parse(url + endPoint),
+          headers: headers, body: json.encode(user));
+
+      return result;
+    } on TimeoutException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: Server response timeout...';
+      // A timeout occurred.
+    } on SocketException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    } catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    }
+  }
+
+  Future updateToken(User user) async {
+    String url = api;
+    String endPoint = 'User/UpdateToken';
+    Map<String, String> headers = {
+      //   HttpHeaders.authorizationHeader: auth,
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // print(url);
+
+    try {
+      Response result = await post(Uri.parse(url + endPoint),
           headers: headers, body: json.encode(user));
 
       return result;

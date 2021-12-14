@@ -11,6 +11,7 @@ class User {
   DateTime? birthday;
   String? gender;
   String? user_type;
+  String? token;
   bool? isActive;
 
   // int? id;
@@ -40,6 +41,7 @@ class User {
       this.birthday,
       this.gender,
       this.user_type,
+      this.token,
       this.isActive});
 
   User.fromJson(Map<String, dynamic> json) {
@@ -54,6 +56,7 @@ class User {
     this.birthday = DateTime.parse(json['birthday']);
     this.gender = json['gender'];
     this.user_type = json['user_type'];
+    this.token = json['token'];
     this.isActive = json['isActive'];
   }
 
@@ -69,6 +72,7 @@ class User {
         'birthday': birthday.toString(),
         'gender': gender,
         'user_type': user_type,
+        'token': token,
         'isActive': isActive,
       };
 }
