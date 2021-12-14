@@ -9,6 +9,7 @@ class Product {
   num? price;
   num? discount;
   String? unit;
+  int? quantity;
   bool? isActive;
   bool? isDeleted;
 
@@ -23,6 +24,7 @@ class Product {
       this.price,
       this.discount,
       this.unit,
+      this.quantity,
       this.isActive,
       this.isDeleted});
 
@@ -30,6 +32,7 @@ class Product {
     this.item_id = json['item_id'];
     this.category_id = json['category_id'];
     this.unit = json['unit'];
+    this.quantity = json['quantity'] ?? 0;
     this.item_code = json['item_code'];
     this.category_desc = json['category_desc'];
     this.title = json['title'];
@@ -45,6 +48,7 @@ class Product {
         'item_id': item_id,
         'category_id': category_id,
         'unit': unit,
+        'quantity': quantity,
         'item_code': item_code,
         'category_desc': category_desc,
         'title': title,

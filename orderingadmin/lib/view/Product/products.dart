@@ -120,8 +120,9 @@ class ProductsPage extends StatelessWidget {
                                         Row(
                                           children: [
                                             Text(
-                                              formatter.format(
-                                                  product.price),
+                                              '₱ ' +
+                                                  formatter
+                                                      .format(product.price),
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.w400,
                                                   fontSize: 16),

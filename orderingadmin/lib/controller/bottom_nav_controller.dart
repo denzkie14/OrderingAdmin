@@ -4,7 +4,7 @@ enum BottomPage { HOME, ORDERS, SEARCH, NOTIFICATIONS, PROFILE }
 
 class BottomNavController extends GetxController {
   int _pageIndex = 2;
-  var _title = 'weShop'.obs;
+  var _title = 'Gravitea'.obs;
   get selectedPage => _pageIndex;
 
   get selectedPageTitle => _title;
@@ -21,7 +21,7 @@ class BottomNavController extends GetxController {
         //   _pageIndex = 1;
         break;
       case 2:
-        _title.value = 'weShop';
+        _title.value = 'Gravitea';
         //  _pageIndex = 2;
         break;
       case 3:

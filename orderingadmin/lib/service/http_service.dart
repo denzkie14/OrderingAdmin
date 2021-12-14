@@ -634,4 +634,35 @@ class HttpService {
       //  return 'Error: No Network Connection...';
     }
   }
+
+  Future getOrders() async {
+    String url = api;
+    String endPoint = 'Order';
+    Map<String, String> headers = {
+      //   HttpHeaders.authorizationHeader: auth,
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // print(url);
+
+    try {
+      Response result = await get(Uri.parse(url + endPoint), headers: headers);
+
+      return result;
+    } on TimeoutException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: Server response timeout...';
+      // A timeout occurred.
+    } on SocketException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    } catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    }
+  }
 }

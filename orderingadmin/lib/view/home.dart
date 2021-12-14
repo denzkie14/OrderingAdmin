@@ -1,15 +1,20 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:orderingadmin/controller/hide_navigation_controller.dart';
+import 'package:orderingadmin/controller/order_controller.dart';
+import 'package:orderingadmin/model/product_model.dart';
 import 'package:orderingadmin/model/user_model.dart';
 import 'package:orderingadmin/service/http_service.dart';
 import 'package:orderingadmin/util/alert_dialog.dart';
+import 'package:orderingadmin/util/confirm_dialog.dart';
 import 'package:orderingadmin/util/prefs.dart';
 import 'package:orderingadmin/util/toast_message.dart';
 import 'package:orderingadmin/view/orders.dart';
@@ -272,7 +277,10 @@ class _HomePageState extends State<HomePage> {
 
 class Home extends StatelessWidget {
   Home({Key? key}) : super(key: key);
+  final api = HttpService();
+  var formatter = NumberFormat('#,###,000.00');
 
+  final DateFormat formatDate = DateFormat('MMM dd, yyyy hh:mm:ss');
   final List<String> data = [
     'Hello',
     'Hello',
@@ -290,127 +298,157 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // height: MediaQuery.of(context).size.height,
-      child: Column(
-        children: [
-          const BannerSection(),
-          const SizedBox(
-            height: 10.0,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Icon(Ionicons.megaphone_outline),
-                SizedBox(
-                  width: 15,
+      height: Get.height - 150,
+      child: GetBuilder<OrderController>(
+          init: OrderController(),
+          builder: (value) {
+            if (value.isLoading.value) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
                 ),
-                Text(
-                  'Trending Stores',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              );
+            }
+
+            if (value.list.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(value.errorMessage.value),
+                    IconButton(
+                      onPressed: () {
+                        value.load();
+                      },
+                      icon: const Icon(Ionicons.refresh_outline),
+                      iconSize: Get.height / 16,
+                    )
+                  ],
                 ),
-              ],
-            ),
-          ),
-          Container(
-            height: 200,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: data.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  child: Container(
-                      color: Colors.purple[300],
-                      padding: EdgeInsets.all(5.0),
-                      width: 180,
-                      child: Text('${data[index]}')),
-                )
-                    //visualDensity: VisualDensity.comfortable,
-                    ;
+              );
+            }
+
+            return RefreshIndicator(
+              onRefresh: () async {
+                value.load();
+                return Future.value();
               },
-            ),
-          ),
+              child: Container(
+                height: Get.height - 150,
+                child: ListView.builder(
+                    //shrinkWrap: true,
+                    itemCount: value.list.length,
+                    itemBuilder: (context, index) {
+                      final order = value.list.elementAt(index);
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                CachedNetworkImage(
+                                  imageUrl:
+                                      '${api.api}Item/Image/${order.items!.first.item_id}',
+                                  imageBuilder: (context, imageProvider) =>
+                                      Container(
+                                    width: 95.0,
+                                    height: 95.0,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover),
+                                    ),
+                                  ),
+                                  placeholder: (context, url) =>
+                                      const CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.green),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        order.order_code ?? '',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16),
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            '₱ ' +
+                                                formatter.format(order.items!
+                                                    .map((e) => e.price)
+                                                    .fold<num>(0,
+                                                        (sum, e) => sum + e!)),
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 16),
+                                          ),
+                                        ],
+                                      ),
+                                      Text(
+                                        formatDate.format(
+                                            order.order_date ?? DateTime.now()),
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ),
 
-          SizedBox(
-            height: 10.0,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Icon(Ionicons.star_outline),
-                SizedBox(
-                  width: 15,
-                ),
-                Text(
-                  'Top products',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-              ],
-            ),
-          ),
-
-          Container(
-            // height: 500,
-            padding: const EdgeInsets.all(8.0),
-            margin: EdgeInsets.only(bottom: 56),
-            child: GridView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 200,
-                    childAspectRatio: 3 / 2,
-                    crossAxisSpacing: 20,
-                    mainAxisSpacing: 20),
-                itemCount: data.length,
-                itemBuilder: (BuildContext ctx, index) {
-                  return Container(
-                    alignment: Alignment.center,
-                    child: Text(data[index]),
-                    decoration: BoxDecoration(
-                        color: Colors.amber,
-                        borderRadius: BorderRadius.circular(15)),
-                  );
-                }),
-            // child: ListView.builder(
-            //   shrinkWrap: true,
-            //   physics: NeverScrollableScrollPhysics(),
-            //   // scrollDirection: Axis.vertical,
-            //   itemCount: data.length,
-            //   itemBuilder: (context, index) {
-            //     return Card(
-            //       child: Container(
-            //           color: Colors.purple[300],
-            //           padding: EdgeInsets.all(5.0),
-            //           width: 180,
-            //           height: 200,
-            //           child: Text('${data[index]}')),
-            //     )
-            //         //visualDensity: VisualDensity.comfortable,
-            //         ;
-            //   },
-            // ),
-          ),
-
-          // Builder(builder: (BuildContext context) {
-          //   for (String s in data) {
-          //     print(s);
-          //     return Card(
-          //       child: Container(
-          //           height: 200,
-          //           color: Colors.purple[300],
-          //           padding: EdgeInsets.all(5.0),
-          //           width: 180,
-          //           child: Text(s)),
-          //     );
-          //   }
-
-          //   return Container();
-          // })
-        ],
-      ),
+                                // Row(
+                                //   mainAxisAlignment: MainAxisAlignment.end,
+                                //   children: [
+                                //     IconButton(
+                                //         onPressed: () {
+                                //           //   Get.to(() =>
+                                //           //  ProductForm(product: product));
+                                //         },
+                                //         color: Colors.green,
+                                //         icon: const Icon(
+                                //             Ionicons.pencil_outline)),
+                                //     IconButton(
+                                //         color: Colors.red,
+                                //         onPressed: () async {
+                                //           // final action =
+                                //           //     await Confirm.showAlertDialog(
+                                //           //           context,
+                                //           //           _keyConfirm,
+                                //           //           'Delete',
+                                //           //           'Are you sure you want delete the selected item?',
+                                //           //           AlertMessagType.QUESTION,
+                                //           //         ) ??
+                                //           //         false;
+                                //           // if (action) {
+                                //           //   _remove(context, product);
+                                //           // }
+                                //         },
+                                //         icon:
+                                //             const Icon(Ionicons.trash_outline))
+                                //   ],
+                                // )
+                              ],
+                            ),
+                          ),
+                          elevation: 10,
+                        ),
+                      );
+                    }),
+              ),
+            );
+          }),
     );
   }
 }
