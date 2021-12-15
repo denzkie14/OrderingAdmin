@@ -89,11 +89,13 @@ class ProductsPage extends StatelessWidget {
                                             fit: BoxFit.cover),
                                       ),
                                     ),
-                                    placeholder: (context, url) =>
-                                        const CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          Colors.green),
+                                    placeholder: (context, url) => CircleAvatar(
+                                      child: Image.asset('assets/logo.jpg'),
                                     ),
+                                    //     const CircularProgressIndicator(
+                                    //   valueColor: AlwaysStoppedAnimation<Color>(
+                                    //       Colors.green),
+                                    // ),
                                     errorWidget: (context, url, error) =>
                                         const Icon(Icons.error),
                                   ),

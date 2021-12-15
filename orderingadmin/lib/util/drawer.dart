@@ -11,6 +11,7 @@ import 'package:orderingadmin/view/Kiosk/kiosks.dart';
 import 'package:orderingadmin/view/Product/products.dart';
 import 'package:orderingadmin/view/login.dart';
 import 'package:orderingadmin/view/profile.dart';
+import 'package:orderingadmin/view/transaction/transactions.dart';
 import 'package:orderingadmin/view/users.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,10 +26,15 @@ appDrawer(BuildContext context) {
       child: ListView(
         children: [
           Stack(
-            children: [
-              const Align(
+            children: const [
+              Align(
                 alignment: Alignment.center,
                 child: UserAccountsDrawerHeader(
+                  decoration: BoxDecoration(
+                      color: Colors.blue,
+                      image: DecorationImage(
+                          image: AssetImage("assets/banner.jpg"),
+                          fit: BoxFit.fill)),
                   currentAccountPicture: CircleAvatar(
                     // radius: 100,
                     backgroundImage: AssetImage(
@@ -36,24 +42,24 @@ appDrawer(BuildContext context) {
                       //  fit: BoxFit.cover,
                     ),
                   ),
-                  accountName: Text('User Name'),
-                  accountEmail: Text('Full Name'),
+                  accountName: Text(''),
+                  accountEmail: Text(''),
                 ),
               ),
-              Positioned(
-                  top: 100,
-                  left: drawerWidth - 65,
-                  child: IconButton(
-                      tooltip: 'Edit Profile',
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Get.to(() => Profile(),
-                            transition: Transition.rightToLeft);
-                      },
-                      icon: const Icon(
-                        Ionicons.pencil,
-                        color: Colors.white,
-                      )))
+              // Positioned(
+              //     top: 100,
+              //     left: drawerWidth - 65,
+              //     child: IconButton(
+              //         tooltip: 'Edit Profile',
+              //         onPressed: () {
+              //           Navigator.pop(context);
+              //           Get.to(() => Profile(),
+              //               transition: Transition.rightToLeft);
+              //         },
+              //         icon: const Icon(
+              //           Ionicons.pencil,
+              //           color: Colors.white,
+              //         )))
             ],
           ),
           ListTile(
@@ -62,35 +68,39 @@ appDrawer(BuildContext context) {
               color: Colors.green,
             ),
             title: const Text('Home'),
-            onTap: () {},
+            onTap: () {
+              Navigator.pop(context);
+            },
           ),
           ListTile(
             leading: const Icon(
-              Ionicons.notifications_outline,
+              Ionicons.wallet_outline,
               color: Colors.green,
             ),
-            title: const Text('Notifications'),
-            onTap: () {},
-          ),
-          ListTile(
-            leading: Icon(
-              Ionicons.file_tray_outline,
-              color: Colors.green,
-            ),
-            title: Text('My Orders'),
-            onTap: () {},
-          ),
-          ListTile(
-            leading: Icon(
-              Ionicons.basket_outline,
-              color: Colors.green,
-            ),
-            title: const Text('Products'),
+            title: const Text('Transactions'),
             onTap: () {
               Navigator.pop(context);
-              Get.to(() => ProductsPage(), transition: Transition.rightToLeft);
+              Get.to(() => TransactionsPage(),
+                  transition: Transition.rightToLeft);
             },
           ),
+          // ListTile(
+          //   leading: const Icon(
+          //     Ionicons.notifications_outline,
+          //     color: Colors.green,
+          //   ),
+          //   title: const Text('Notifications'),
+          //   onTap: () {},
+          // ),
+          // ListTile(
+          //   leading: Icon(
+          //     Ionicons.file_tray_outline,
+          //     color: Colors.green,
+          //   ),
+          //   title: Text('Orders'),
+          //   onTap: () {},
+          // ),
+
           ListTile(
             leading: const Icon(
               Ionicons.apps_outline,
@@ -101,6 +111,17 @@ appDrawer(BuildContext context) {
               Navigator.pop(context);
               Get.to(() => CategoriesPage(),
                   transition: Transition.rightToLeft);
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Ionicons.basket_outline,
+              color: Colors.green,
+            ),
+            title: const Text('Products'),
+            onTap: () {
+              Navigator.pop(context);
+              Get.to(() => ProductsPage(), transition: Transition.rightToLeft);
             },
           ),
           ListTile(
@@ -137,14 +158,14 @@ appDrawer(BuildContext context) {
           //   title: Text('Help & Support'),
           //   onTap: () {},
           // ),
-          ListTile(
-            leading: Icon(
-              Ionicons.settings_outline,
-              color: Colors.green,
-            ),
-            title: Text('Settings'),
-            onTap: () {},
-          ),
+          // ListTile(
+          //   leading: Icon(
+          //     Ionicons.settings_outline,
+          //     color: Colors.green,
+          //   ),
+          //   title: Text('Settings'),
+          //   onTap: () {},
+          // ),
           const Divider(),
           ListTile(
             leading: const Icon(

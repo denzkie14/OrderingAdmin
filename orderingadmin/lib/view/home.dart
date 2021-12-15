@@ -17,7 +17,8 @@ import 'package:orderingadmin/util/alert_dialog.dart';
 import 'package:orderingadmin/util/confirm_dialog.dart';
 import 'package:orderingadmin/util/prefs.dart';
 import 'package:orderingadmin/util/toast_message.dart';
-import 'package:orderingadmin/view/orders.dart';
+import 'package:orderingadmin/view/order.dart';
+import 'package:orderingadmin/view/transaction/transactions.dart';
 import 'package:orderingadmin/view/wishlist.dart';
 import 'package:orderingadmin/widgets/carousel_banner.dart';
 
@@ -40,6 +41,7 @@ class _HomePageState extends State<HomePage> {
   final HideNavbar hiding = HideNavbar();
   final api = HttpService();
   final navController = Get.put(BottomNavController());
+  final OrderController cOrder = Get.find();
   final List<BottomNavigationBarItem> navItems = [
     BottomNavigationBarItem(
         icon: Icon(Ionicons.notifications_outline), label: 'Notifications'),
@@ -86,10 +88,16 @@ class _HomePageState extends State<HomePage> {
     FirebaseMessaging.onMessage.listen((RemoteMessage event) {
       print("message recieved");
       print(event.notification!.body);
+      cOrder.load();
+      print('done loading...');
+      //  OrderController().load();
       // add code to refresh order list
     });
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
       print('Message clicked!');
+      cOrder.load();
+      print('done loading...');
+      //   OrderController().load();
       // add code to refresh order list
     });
   }
@@ -141,10 +149,10 @@ class _HomePageState extends State<HomePage> {
                 elevation: 0.0,
                 iconTheme: CustomTheme.lightIconTheme,
                 actions: [
-                  IconButton(
-                      onPressed: () {}, icon: Icon(Ionicons.cart_outline)),
-                  IconButton(
-                      onPressed: () {}, icon: Icon(Ionicons.map_outline)),
+                  // IconButton(
+                  //     onPressed: () {}, icon: Icon(Ionicons.cart_outline)),
+                  // IconButton(
+                  //     onPressed: () {}, icon: Icon(Ionicons.map_outline)),
                   IconButton(
                     onPressed: () {
                       Get.to(() => Profile(),
@@ -177,7 +185,7 @@ class _HomePageState extends State<HomePage> {
                   } else if (controller.selectedPage == 2) {
                     return Home();
                   } else if (controller.selectedPage == 3) {
-                    return Orders();
+                    return TransactionsPage();
                   } else if (controller.selectedPage == 4) {
                     return Wishlist();
                   } else {
@@ -342,107 +350,114 @@ class Home extends StatelessWidget {
                       final order = value.list.elementAt(index);
                       return Padding(
                         padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                CachedNetworkImage(
-                                  imageUrl:
-                                      '${api.api}Item/Image/${order.items!.first.item_id}',
-                                  imageBuilder: (context, imageProvider) =>
-                                      Container(
-                                    width: 95.0,
-                                    height: 95.0,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                          image: imageProvider,
-                                          fit: BoxFit.cover),
+                        child: GestureDetector(
+                          onTap: () => Get.to(() => OrderPage(order)),
+                          child: Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  CachedNetworkImage(
+                                    imageUrl:
+                                        '${api.api}Item/Image/${order.items!.first.item_id}',
+                                    imageBuilder: (context, imageProvider) =>
+                                        Container(
+                                      width: 95.0,
+                                      height: 95.0,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                            image: imageProvider,
+                                            fit: BoxFit.cover),
+                                      ),
+                                    ),
+                                    placeholder: (context, url) => CircleAvatar(
+                                      child: Image.asset('assets/logo.jpg'),
+                                    ),
+                                    //     const CircularProgressIndicator(
+                                    //   valueColor: AlwaysStoppedAnimation<Color>(
+                                    //       Colors.green),
+                                    // ),
+                                    errorWidget: (context, url, error) =>
+                                        const Icon(Icons.error),
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          order.order_code ?? '',
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 16),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              '₱ ' +
+                                                  formatter.format(order.items!
+                                                      .map((e) => e.price)
+                                                      .fold<num>(
+                                                          0,
+                                                          (sum, e) =>
+                                                              sum + e!)),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 16),
+                                            ),
+                                          ],
+                                        ),
+                                        Text(
+                                          formatDate.format(order.order_date ??
+                                              DateTime.now()),
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 12),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  placeholder: (context, url) =>
-                                      const CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.green),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        order.order_code ?? '',
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16),
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            '₱ ' +
-                                                formatter.format(order.items!
-                                                    .map((e) => e.price)
-                                                    .fold<num>(0,
-                                                        (sum, e) => sum + e!)),
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: 16),
-                                          ),
-                                        ],
-                                      ),
-                                      Text(
-                                        formatDate.format(
-                                            order.order_date ?? DateTime.now()),
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
-                                ),
 
-                                // Row(
-                                //   mainAxisAlignment: MainAxisAlignment.end,
-                                //   children: [
-                                //     IconButton(
-                                //         onPressed: () {
-                                //           //   Get.to(() =>
-                                //           //  ProductForm(product: product));
-                                //         },
-                                //         color: Colors.green,
-                                //         icon: const Icon(
-                                //             Ionicons.pencil_outline)),
-                                //     IconButton(
-                                //         color: Colors.red,
-                                //         onPressed: () async {
-                                //           // final action =
-                                //           //     await Confirm.showAlertDialog(
-                                //           //           context,
-                                //           //           _keyConfirm,
-                                //           //           'Delete',
-                                //           //           'Are you sure you want delete the selected item?',
-                                //           //           AlertMessagType.QUESTION,
-                                //           //         ) ??
-                                //           //         false;
-                                //           // if (action) {
-                                //           //   _remove(context, product);
-                                //           // }
-                                //         },
-                                //         icon:
-                                //             const Icon(Ionicons.trash_outline))
-                                //   ],
-                                // )
-                              ],
+                                  // Row(
+                                  //   mainAxisAlignment: MainAxisAlignment.end,
+                                  //   children: [
+                                  //     IconButton(
+                                  //         onPressed: () {
+                                  //           //   Get.to(() =>
+                                  //           //  ProductForm(product: product));
+                                  //         },
+                                  //         color: Colors.green,
+                                  //         icon: const Icon(
+                                  //             Ionicons.pencil_outline)),
+                                  //     IconButton(
+                                  //         color: Colors.red,
+                                  //         onPressed: () async {
+                                  //           // final action =
+                                  //           //     await Confirm.showAlertDialog(
+                                  //           //           context,
+                                  //           //           _keyConfirm,
+                                  //           //           'Delete',
+                                  //           //           'Are you sure you want delete the selected item?',
+                                  //           //           AlertMessagType.QUESTION,
+                                  //           //         ) ??
+                                  //           //         false;
+                                  //           // if (action) {
+                                  //           //   _remove(context, product);
+                                  //           // }
+                                  //         },
+                                  //         icon:
+                                  //             const Icon(Ionicons.trash_outline))
+                                  //   ],
+                                  // )
+                                ],
+                              ),
                             ),
+                            elevation: 10,
                           ),
-                          elevation: 10,
                         ),
                       );
                     }),

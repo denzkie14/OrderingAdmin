@@ -665,4 +665,144 @@ class HttpService {
       //  return 'Error: No Network Connection...';
     }
   }
+
+  Future getTransactions() async {
+    String url = api;
+    String endPoint = 'Transaction';
+    Map<String, String> headers = {
+      //   HttpHeaders.authorizationHeader: auth,
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // print(url);
+
+    try {
+      Response result = await get(Uri.parse(url + endPoint), headers: headers);
+
+      return result;
+    } on TimeoutException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: Server response timeout...';
+      // A timeout occurred.
+    } on SocketException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    } catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    }
+  }
+
+  Future updateItemOrder(int order_id, int item_id, int qty) async {
+    String url = api;
+    String endPoint = 'Order/AddItemQuantity';
+    Map<String, String> headers = {
+      //   HttpHeaders.authorizationHeader: auth,
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // print(url);
+
+    try {
+      print(url + endPoint + '?order_id=$order_id&item_id=$item_id&qty=$qty');
+      Response result = await put(
+        Uri.parse(
+            url + endPoint + '?order_id=$order_id&item_id=$item_id&qty=$qty'),
+        headers: headers,
+      );
+      // body: json.encode(product)
+
+      return result;
+    } on TimeoutException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: Server response timeout...';
+      // A timeout occurred.
+    } on SocketException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    } catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    }
+  }
+
+  Future removeItemOrder(int order_id, int item_id) async {
+    String url = api;
+    String endPoint = 'Order/RemoveItem';
+    Map<String, String> headers = {
+      //   HttpHeaders.authorizationHeader: auth,
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // print(url);
+
+    try {
+      print(url + endPoint + '?order_id=$order_id&item_id=$item_id');
+      Response result = await delete(
+        Uri.parse(url + endPoint + '?order_id=$order_id&item_id=$item_id'),
+        headers: headers,
+      );
+      // body: json.encode(product)
+
+      return result;
+    } on TimeoutException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: Server response timeout...';
+      // A timeout occurred.
+    } on SocketException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    } catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    }
+  }
+
+  Future confirmOrder(int order_id, int user_id) async {
+    String url = api;
+    String endPoint = 'Order/ConfirmOrder';
+    Map<String, String> headers = {
+      //   HttpHeaders.authorizationHeader: auth,
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // print(url);
+
+    try {
+      print(url + endPoint + '?order_id=$order_id&user_id=$user_id');
+      Response result = await put(
+        Uri.parse(url + endPoint + '?order_id=$order_id&user_id=$user_id'),
+        headers: headers,
+      );
+      // body: json.encode(product)
+
+      return result;
+    } on TimeoutException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: Server response timeout...';
+      // A timeout occurred.
+    } on SocketException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    } catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    }
+  }
 }

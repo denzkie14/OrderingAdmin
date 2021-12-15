@@ -9,10 +9,12 @@ import 'package:orderingadmin/util/prefs.dart';
 import 'package:orderingadmin/view/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'controller/order_controller.dart';
 import 'view/login.dart';
 
 Future<void> _messageHandler(RemoteMessage message) async {
   print('background message ${message.notification!.body}');
+//  OrderController().load();
 }
 
 void main() async {
@@ -42,7 +44,7 @@ class pLogin extends StatelessWidget {
       initialRoute: 'login',
       routes: {
         'login': (context) => LoginPage(),
-        'home': (context) => LoginPage(),
+        'home': (context) => HomePage(),
       },
       // home: HomePage(),
     );
@@ -51,8 +53,8 @@ class pLogin extends StatelessWidget {
 
 class pHome extends StatelessWidget {
   final User user;
-
-  const pHome(this.user);
+  final cOrder = Get.put(OrderController());
+  pHome(this.user);
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -62,7 +64,7 @@ class pHome extends StatelessWidget {
       initialRoute: 'home',
       routes: {
         'login': (context) => LoginPage(),
-        'home': (context) => LoginPage(),
+        'home': (context) => HomePage(),
         // LoginScreen.routeName: (context) => const LoginScreen(),
         // DashboardScreen.routeName: (context) => const DashboardScreen(),
       },
