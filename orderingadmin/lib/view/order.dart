@@ -47,9 +47,9 @@ class _OrderPageState extends State<OrderPage> {
 
   buildAppBar(BuildContext context) {
     return AppBar(
-      title: const Text(
-        'Ordered Items',
-        style: TextStyle(color: Colors.green),
+      title: Text(
+        _currentOrder.order_code ?? 'Ordered Items',
+        style: const TextStyle(color: Colors.green),
       ),
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -62,6 +62,32 @@ class _OrderPageState extends State<OrderPage> {
           Get.back();
         },
       ),
+      actions: [
+        Visibility(
+          visible: _currentOrder.received_by! == 0 ? true : false,
+          child: IconButton(
+            icon: const Icon(
+              Ionicons.trash_outline,
+              color: Colors.red,
+            ),
+            onPressed: () async {
+              final action = await Confirm.showAlertDialog(
+                    context,
+                    _keyConfirm,
+                    'Cancel Order',
+                    'Are you sure you want to cancel this order?',
+                    AlertMessagType.QUESTION,
+                  ) ??
+                  false;
+              if (action) {
+                await cancelOrder(context);
+              }
+
+              //   Get.offAll(() => HomePage());
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -69,7 +95,6 @@ class _OrderPageState extends State<OrderPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
     _currentOrder = widget.order;
   }
 
@@ -88,181 +113,16 @@ class _OrderPageState extends State<OrderPage> {
                     itemCount: _currentOrder.items!.length,
                     itemBuilder: (context, index) {
                       final product = _currentOrder.items!.elementAt(index);
-                      return Dismissible(
-                        key: UniqueKey(),
-                        onDismissed: (_) {},
-                        confirmDismiss: (DismissDirection direction) async {
-                          final action = await Confirm.showAlertDialog(
-                                context,
-                                _keyConfirm,
-                                'Remove',
-                                'Are you sure you want remove the selected item?',
-                                AlertMessagType.QUESTION,
-                              ) ??
-                              false;
-                          if (action) {
-                            removeItem(context, product);
-                            return true;
-                          } else {
-                            return false;
-                          }
-                        },
-                        background: Container(
-                          color: Colors.red,
-                          padding: const EdgeInsets.only(left: 25),
-                          alignment: Alignment.centerLeft,
-                          child: const Icon(
-                            Icons.delete,
-                            color: Colors.white,
-                          ),
-                        ),
-                        direction: DismissDirection.startToEnd,
-                        child: GestureDetector(
-                          onTap: () async {
-                            int currentValue = product.quantity!;
-                            final qty = await QuantityDialog.showAlertDialog(
-                                context, product) as int;
-                            if (qty > 0 && currentValue != qty) {
-                              // Product s = product;
-                              // s.quantity = qty;
-
-                              // order.items!.add(s);
-                              updateQuantity(context, product, qty);
-                            }
-                          },
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 8.0, right: 8.0),
-                            child: Card(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    CachedNetworkImage(
-                                      imageUrl:
-                                          '${api.api}Item/Image/${product.item_id}',
-                                      imageBuilder: (context, imageProvider) =>
-                                          Container(
-                                        width: 95.0,
-                                        height: 95.0,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          image: DecorationImage(
-                                              image: imageProvider,
-                                              fit: BoxFit.cover),
-                                        ),
-                                      ),
-                                      placeholder: (context, url) =>
-                                          const CircularProgressIndicator(
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                Colors.green),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.error),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Column(
-                                        //       mainAxisAlignment:
-                                        //   MainAxisAlignment.spaceAround,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            product.title ?? '',
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 16),
-                                          ),
-                                          Text(
-                                            product.item_desc ?? '',
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: 16),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          '₱ ' +
-                                              formatter.format(product.price),
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          '@ ${product.quantity} ${product.unit}',
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          '₱ ' +
-                                              formatter.format((product.price! *
-                                                  product.quantity!)),
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14),
-                                        ),
-                                      ],
-                                    ),
-                                    //     Row(
-                                    //       mainAxisAlignment: MainAxisAlignment.end,
-                                    //       children: [
-                                    //         // IconButton(
-                                    //         //     onPressed: () {},
-                                    //         //     color: Colors.green,
-                                    //         //     icon: const Icon(
-                                    //         //         Ionicons.add_outline)),
-                                    //         // IconButton(
-                                    //         //     onPressed: () {
-                                    //         //       Get.to(() => ProductForm(
-                                    //         //           product: product));
-                                    //         //     },
-                                    //         //     color: Colors.green,
-                                    //         //     icon: const Icon(
-                                    //         //         Ionicons.pencil_outline)),
-                                    //         IconButton(
-                                    //             color: Colors.red,
-                                    //             onPressed: () async {
-                                    //               final action =
-                                    //                   await Confirm.showAlertDialog(
-                                    //                         context,
-                                    //                         _keyConfirm,
-                                    //                         'Remove',
-                                    //                         'Are you sure you want remove the selected item?',
-                                    //                         AlertMessagType.QUESTION,
-                                    //                       ) ??
-                                    //                       false;
-                                    //               if (action) {
-                                    //                 removeItem(context, product);
-                                    //               }
-                                    //             },
-                                    //             icon: const Icon(
-                                    //                 Ionicons.trash_outline))
-                                    //       ],
-                                    //     )
-                                  ],
-                                ),
-                              ),
-                              elevation: 10,
-                            ),
-                          ),
-                        ),
-                      );
+                      print(_currentOrder.received_by);
+                      if (_currentOrder.received_by! > 0) {
+                        return itemList(context, product);
+                      } else {
+                        return dismissibleItemList(context, product);
+                      }
                     }),
               ),
               Visibility(
-                visible: _currentOrder.or_number == null ? false : true,
+                visible: _currentOrder.received_by! > 0 ? true : false,
                 child: Container(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Column(
@@ -306,13 +166,26 @@ class _OrderPageState extends State<OrderPage> {
                           ),
                         ],
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Type :  ${_currentOrder.kiosk_type}',
+                            style: TextStyle(
+                                color: Colors.grey[700],
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
               ),
               Visibility(
-                visible: _currentOrder.or_number == null ? true : false,
+                visible: _currentOrder.received_by! == 0 ? true : false,
                 child: Container(
+                  padding: const EdgeInsets.only(left: 8.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -334,12 +207,24 @@ class _OrderPageState extends State<OrderPage> {
                           Text(
                             'Total :  ₱ ' +
                                 formatter.format(_currentOrder.items!
-                                    .map((e) => e.price)
-                                    .fold<num>(0, (sum, e) => sum + e!)),
+                                    .map((e) => (e.price! * e.quantity!))
+                                    .fold<num>(0, (sum, e) => sum + e)),
                             style: TextStyle(
                                 color: Colors.grey[700],
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Type :  ${_currentOrder.kiosk_type}',
+                            style: TextStyle(
+                                color: Colors.grey[700],
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14),
                           ),
                         ],
                       ),
@@ -367,7 +252,6 @@ class _OrderPageState extends State<OrderPage> {
                                 if (action) {
                                   await confirmOrder(context);
                                 }
-
                                 //   Get.offAll(() => HomePage());
                               },
                               child: Text("Confirm Order",
@@ -434,6 +318,234 @@ class _OrderPageState extends State<OrderPage> {
     } finally {
       // Navigator.pop(_keyLoader.currentContext!, _keyLoader);
     }
+  }
+
+  dismissibleItemList(BuildContext context, Product product) {
+    return Dismissible(
+      key: UniqueKey(),
+      onDismissed: (_) {},
+      confirmDismiss: (DismissDirection direction) async {
+        if (_currentOrder.items!.length == 1) {
+          ToastMessage.showToastMessage(
+              context,
+              'Unable to remove: Order must have atleast 1 item.',
+              AlertMessagType.DEFAULT);
+
+          return false;
+        }
+
+        final action = await Confirm.showAlertDialog(
+              context,
+              _keyConfirm,
+              'Remove',
+              'Are you sure you want remove the selected item?',
+              AlertMessagType.QUESTION,
+            ) ??
+            false;
+        if (action) {
+          removeItem(context, product);
+          return true;
+        } else {
+          return false;
+        }
+      },
+      background: Container(
+        color: Colors.red,
+        padding: const EdgeInsets.only(left: 25),
+        alignment: Alignment.centerLeft,
+        child: const Icon(
+          Icons.delete,
+          color: Colors.white,
+        ),
+      ),
+      direction: DismissDirection.startToEnd,
+      child: GestureDetector(
+        onTap: () async {
+          int currentValue = product.quantity!;
+          final qty =
+              await QuantityDialog.showAlertDialog(context, product) as int;
+          if (qty > 0 && currentValue != qty) {
+            // Product s = product;
+            // s.quantity = qty;
+
+            // order.items!.add(s);
+            updateQuantity(context, product, qty);
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  CachedNetworkImage(
+                    imageUrl: '${api.api}Item/Image/${product.item_id}',
+                    imageBuilder: (context, imageProvider) => Container(
+                      width: 95.0,
+                      height: 95.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            image: imageProvider, fit: BoxFit.cover),
+                      ),
+                    ),
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                    ),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      //       mainAxisAlignment:
+                      //   MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          product.title ?? '',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
+                        Text(
+                          product.item_desc ?? '',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w400, fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        '₱ ' + formatter.format(product.price),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '@ ${product.quantity} ${product.unit}',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '₱ ' +
+                            formatter
+                                .format((product.price! * product.quantity!)),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            elevation: 10,
+          ),
+        ),
+      ),
+    );
+  }
+
+  itemList(BuildContext context, Product product) {
+    return GestureDetector(
+      onTap: () async {
+        // int currentValue = product.quantity!;
+        // final qty =
+        //     await QuantityDialog.showAlertDialog(context, product) as int;
+        // if (qty > 0 && currentValue != qty) {
+        //   // Product s = product;
+        //   // s.quantity = qty;
+
+        //   // order.items!.add(s);
+        //   updateQuantity(context, product, qty);
+        // }
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                CachedNetworkImage(
+                  imageUrl: '${api.api}Item/Image/${product.item_id}',
+                  imageBuilder: (context, imageProvider) => Container(
+                    width: 95.0,
+                    height: 95.0,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                          image: imageProvider, fit: BoxFit.cover),
+                    ),
+                  ),
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                  ),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    //       mainAxisAlignment:
+                    //   MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product.title ?? '',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      Text(
+                        product.item_desc ?? '',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w400, fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '₱ ' + formatter.format(product.price),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '@ ${product.quantity} ${product.unit}',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '₱ ' +
+                          formatter
+                              .format((product.price! * product.quantity!)),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          elevation: 10,
+        ),
+      ),
+    );
   }
 
   removeItem(BuildContext context, Product product) async {
@@ -508,6 +620,46 @@ class _OrderPageState extends State<OrderPage> {
           'Error: Pelase check your network and try again.',
           AlertMessagType.DEFAULT);
       print('Error confirm order: ${e.toString()}');
+    } finally {
+      Navigator.pop(_keyLoader.currentContext!, _keyLoader);
+    }
+  }
+
+  cancelOrder(BuildContext context) async {
+    // final prefs = await SharedPreferences.getInstance();
+    LoadingDialog.showLoadingDialog(context, _keyLoader, 'Please wait...');
+//_controller
+    try {
+      final pref = SharedPref();
+      User _user = User.fromJson(await pref.read('user'));
+      var request =
+          await api.cancelOrder(widget.order.order_id!, _user.user_id!);
+      if (request.statusCode == 200) {
+        // setState(() {
+        //   _currentOrder.items!.removeWhere((i) => i.item_id == product.item_id);
+        // });
+        ToastMessage.showToastMessage(
+            context, 'Order Cancelled', AlertMessagType.DEFAULT);
+        // _controller.list
+        //     .where((o) => o.order_id == widget.order.order_id)
+        //     .first
+        //     .items!
+        //     .removeWhere((i) => i.item_id == product.item_id);
+        _controller.load();
+        Get.back();
+      } else {
+        ToastMessage.showToastMessage(
+            context,
+            'Failed to cancel order, please try again.',
+            AlertMessagType.DEFAULT);
+        print('Error cancel order: ${request.body}');
+      }
+    } catch (e) {
+      ToastMessage.showToastMessage(
+          context,
+          'Error: Pelase check your network and try again.',
+          AlertMessagType.DEFAULT);
+      print('Error cancel order: ${e.toString()}');
     } finally {
       Navigator.pop(_keyLoader.currentContext!, _keyLoader);
     }

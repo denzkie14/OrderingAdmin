@@ -11,19 +11,22 @@ class Order {
   int? received_by;
   DateTime? order_date;
   List<Product>? items;
+  bool? isVoid;
+  bool? isCancelled;
 
-  Order({
-    this.order_id,
-    this.kiosk_id,
-    this.kiosk_type,
-    this.order_code,
-    this.or_number,
-    this.queue,
-    this.order_by,
-    this.received_by,
-    this.order_date,
-    this.items,
-  });
+  Order(
+      {this.order_id,
+      this.kiosk_id,
+      this.kiosk_type,
+      this.order_code,
+      this.or_number,
+      this.queue,
+      this.order_by,
+      this.received_by,
+      this.order_date,
+      this.items,
+      this.isVoid,
+      this.isCancelled});
 
   Order.fromJson(Map<String, dynamic> json) {
     this.order_id = json['order_id'];
@@ -38,6 +41,8 @@ class Order {
     this.items = (json['items'] as List)
         .map((i) => Product.fromJson(i))
         .toList(); // json['items'] as List<Product>;
+    this.isVoid = json['isVoid'] ?? false;
+    this.isCancelled = json['isCancelled'] ?? false;
   }
 
   Map<String, dynamic> toJson() => {
@@ -51,5 +56,7 @@ class Order {
         'received_by': received_by,
         'order_date': order_date,
         'items': items,
+        'isVoid': isVoid,
+        'isCancelled': isCancelled
       };
 }

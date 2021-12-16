@@ -155,12 +155,12 @@ class _HomePageState extends State<HomePage> {
                   //     onPressed: () {}, icon: Icon(Ionicons.map_outline)),
                   IconButton(
                     onPressed: () {
-                      Get.to(() => Profile(),
-                          transition: Transition.rightToLeft);
+                      // Get.to(() => Profile(),
+                      //     transition: Transition.rightToLeft);
 
                       //  navController.setPage(2);
                     },
-                    icon: Hero(
+                    icon: const Hero(
                       tag: 'avatar',
                       child: CircleAvatar(
                         // radius: 100,
@@ -385,40 +385,53 @@ class Home extends StatelessWidget {
                                     width: 10,
                                   ),
                                   Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          order.order_code ?? '',
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16),
-                                        ),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              '₱ ' +
-                                                  formatter.format(order.items!
-                                                      .map((e) => e.price)
-                                                      .fold<num>(
-                                                          0,
-                                                          (sum, e) =>
-                                                              sum + e!)),
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 16),
-                                            ),
-                                          ],
-                                        ),
-                                        Text(
-                                          formatDate.format(order.order_date ??
-                                              DateTime.now()),
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 12),
-                                        ),
-                                      ],
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.only(left: 12.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            order.order_code ?? '',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16),
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                '₱ ' +
+                                                    formatter.format(order
+                                                        .items!
+                                                        .map((e) => (e.price! *
+                                                            e.quantity!))
+                                                        .fold<num>(
+                                                            0,
+                                                            (sum, e) =>
+                                                                sum + e)),
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 16),
+                                              ),
+                                            ],
+                                          ),
+                                          Text(
+                                            formatDate.format(
+                                                order.order_date ??
+                                                    DateTime.now()),
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 12),
+                                          ),
+                                          Text(
+                                            'Type: ${order.kiosk_type}',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 12),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
 

@@ -22,13 +22,13 @@ class HttpService {
   //   return Uri.encodeComponent(component);
   // }
 
-  // final String rootURL = "http://192.168.1.3/";
-  // final String rootURLSSL = "http://192.168.1.3/";
-  // final String api = "http://192.168.1.3/api/";
+  final String rootURL = "http://www.gravitea.somee.com/";
+  final String rootURLSSL = "http://www.gravitea.somee.com/";
+  final String api = "http://www.gravitea.somee.com/api/";
 
-  final String rootURL = "http://188.180.100.35/Ordering/";
-  final String rootURLSSL = "http://188.180.100.35/Ordering/";
-  final String api = "http://188.180.100.35/Ordering/api/";
+  // final String rootURL = "http://188.180.100.35/Ordering/";
+  // final String rootURLSSL = "http://188.180.100.35/Ordering/";
+  // final String api = "http://188.180.100.35/Ordering/api/";
 
   Future login(LoginRequest login) async {
     String url = api;
@@ -784,6 +784,42 @@ class HttpService {
     try {
       print(url + endPoint + '?order_id=$order_id&user_id=$user_id');
       Response result = await put(
+        Uri.parse(url + endPoint + '?order_id=$order_id&user_id=$user_id'),
+        headers: headers,
+      );
+      // body: json.encode(product)
+
+      return result;
+    } on TimeoutException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: Server response timeout...';
+      // A timeout occurred.
+    } on SocketException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    } catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    }
+  }
+
+  Future cancelOrder(int order_id, int user_id) async {
+    String url = api;
+    String endPoint = 'Order/CancelOrder';
+    Map<String, String> headers = {
+      //   HttpHeaders.authorizationHeader: auth,
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // print(url);
+
+    try {
+      print(url + endPoint + '?order_id=$order_id&user_id=$user_id');
+      Response result = await delete(
         Uri.parse(url + endPoint + '?order_id=$order_id&user_id=$user_id'),
         headers: headers,
       );
