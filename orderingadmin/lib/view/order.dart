@@ -40,7 +40,7 @@ class _OrderPageState extends State<OrderPage> {
 
   final api = HttpService();
 
-  final formatter = NumberFormat('#,###,000.00');
+  final formatter = NumberFormat('#,###,##0.00');
   final DateFormat formatDate = DateFormat('MMM dd, yyyy hh:mm:ss');
   TextStyle style = const TextStyle(
       fontFamily: 'Montserrat', fontSize: 20.0, color: Colors.green);

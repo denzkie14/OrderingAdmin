@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:orderingadmin/controller/category_controller.dart';
 import 'package:orderingadmin/controller/product_controller.dart';
 import 'package:orderingadmin/model/product_model.dart';
 import 'package:orderingadmin/service/http_service.dart';
@@ -18,10 +19,11 @@ import 'package:orderingadmin/view/Product/product_form.dart';
 class ProductsPage extends StatelessWidget {
   // const UsersPage({ Key? key }) : super(key: key);
   final ProductController _controller = Get.put(ProductController());
+  //  final CategoryController _category = Get.find();
   final GlobalKey<State> _keyLoader = new GlobalKey<State>();
   final GlobalKey<State> _keyConfirm = new GlobalKey<State>();
   final api = HttpService();
-  var formatter = NumberFormat('#,###,000.00');
+  var formatter = NumberFormat('#,###,##0.00');
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +70,7 @@ class ProductsPage extends StatelessWidget {
                       itemCount: value.list.length,
                       itemBuilder: (context, index) {
                         final product = value.list.elementAt(index);
+
                         return Padding(
                           padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                           child: Card(
@@ -162,7 +165,22 @@ class ProductsPage extends StatelessWidget {
                                             }
                                           },
                                           icon: const Icon(
-                                              Ionicons.trash_outline))
+                                              Ionicons.trash_outline)),
+                                      Switch(
+                                        value: product.isActive ?? true,
+                                        onChanged: (value) {
+                                          _updateStatus(
+                                              context, product, value);
+                                          //   print(value);
+                                          //     setState(() {
+//                                           product.isActive = value;
+// _updateStatus
+                                          //    });
+                                        },
+                                        activeTrackColor:
+                                            Colors.lightGreenAccent,
+                                        activeColor: Colors.green,
+                                      ),
                                     ],
                                   )
                                 ],
@@ -204,6 +222,32 @@ class ProductsPage extends StatelessWidget {
         },
       ),
     );
+  }
+
+  _updateStatus(BuildContext context, Product product, bool status) async {
+    LoadingDialog.showLoadingDialog(context, _keyLoader, 'Please wait...');
+    try {
+      var response = await api.updateProductStatus(product, status);
+      if (response.statusCode == 200) {
+        print('Status updated!');
+        ToastMessage.showToastMessage(
+            context, "Item status updated.", AlertMessagType.DEFAULT);
+        _controller.load();
+      } else {
+        var body = jsonDecode(response.body);
+        ToastMessage.showToastMessage(context,
+            "Failed to update, please try again.", AlertMessagType.DEFAULT);
+        print(response.statusCode.toString() + ': ' + body);
+      }
+    } catch (e) {
+      ToastMessage.showToastMessage(
+          context,
+          "Error occured: please check your network and try again.",
+          AlertMessagType.DEFAULT);
+      print('Error update status : ' + e.toString());
+    } finally {
+      Navigator.pop(_keyLoader.currentContext!, _keyLoader);
+    }
   }
 
   _remove(BuildContext context, Product product) async {

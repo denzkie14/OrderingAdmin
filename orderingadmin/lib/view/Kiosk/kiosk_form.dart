@@ -40,14 +40,14 @@ class _KioskFormState extends State<KioskForm> {
 
   final _formKey = GlobalKey<FormState>();
 
-  String selectedType = "Table";
+  String selectedType = "Dine in";
 
   DateTime selectedDate = DateTime.now();
 
   List<DropdownMenuItem<String>> get typeItem {
     List<DropdownMenuItem<String>> menuItems = [
-      const DropdownMenuItem(child: Text("Table"), value: "Table"),
-      const DropdownMenuItem(child: Text("Wall"), value: "Wall"),
+      const DropdownMenuItem(child: Text("Dine in"), value: "Dine in"),
+      const DropdownMenuItem(child: Text("Take out"), value: "Take out"),
     ];
     return menuItems;
   }

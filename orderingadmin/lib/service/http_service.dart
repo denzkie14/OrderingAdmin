@@ -603,6 +603,40 @@ class HttpService {
     }
   }
 
+  Future updateProductStatus(Product product, bool status) async {
+    String url = api;
+    String endPoint = 'Item/UpdateStatus?id=${product.item_id}&status=$status';
+    Map<String, String> headers = {
+      //   HttpHeaders.authorizationHeader: auth,
+      'Content-type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    // print(url);
+
+    try {
+      Response result = await get(
+        Uri.parse(url + endPoint),
+        headers: headers,
+      );
+
+      return result;
+    } on TimeoutException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: Server response timeout...';
+      // A timeout occurred.
+    } on SocketException catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    } catch (e) {
+      print(e.toString());
+      return Future.value();
+      //  return 'Error: No Network Connection...';
+    }
+  }
+
   Future removeProduct(Product product) async {
     String url = api;
     String endPoint = 'Item';

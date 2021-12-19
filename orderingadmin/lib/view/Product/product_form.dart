@@ -58,7 +58,13 @@ class _ProductFormState extends State<ProductForm> {
     if (widget.product != null) {
       setState(() {
         cDesc.text = widget.product!.title ?? "";
-        // selectedType = widget.kiosk!.kiosk_type ?? "";
+        cTitle.text = widget.product!.title ?? "";
+        cDesc.text = widget.product!.item_desc ?? "";
+        cPrice.text = widget.product!.price.toString();
+        cUnit.text = widget.product!.unit ?? "";
+
+        cDesc.text = widget.product!.discount.toString();
+
         // cMname.text = widget.user!.mname ?? "";
         // cLname.text = widget.user!.lname ?? "";
         // selectedExt = widget.user!.ext_name ?? "N/A";
@@ -108,7 +114,7 @@ class _ProductFormState extends State<ProductForm> {
   Widget buildGridView() {
     if (widget.product != null && images.isEmpty) {
       return CachedNetworkImage(
-        imageUrl: '${api.api}Category/Image/${widget.product!.category_id}',
+        imageUrl: '${api.api}Item/Image/${widget.product!.item_id}',
         imageBuilder: (context, imageProvider) => Container(
           width: 300.0,
           height: 300.0,
@@ -330,6 +336,10 @@ class _ProductFormState extends State<ProductForm> {
                     }
                     return null;
                   },
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ], // Only numbers can be entered
                   obscureText: false,
                   style: style,
                   decoration: InputDecoration(
@@ -390,6 +400,10 @@ class _ProductFormState extends State<ProductForm> {
                   //   }
                   //   return null;
                   // },
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ], // Only numbers can be entered
                   obscureText: false,
                   style: style,
                   decoration: InputDecoration(

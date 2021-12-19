@@ -194,86 +194,86 @@ class _HomePageState extends State<HomePage> {
                 }),
               ),
 
-              bottomNavigationBar: AnimatedContainer(
-                duration: Duration(milliseconds: 250),
-                height: value ? kBottomNavigationBarHeight : 0.0,
-                child: Wrap(
-                  children: <Widget>[
-                    GetBuilder<BottomNavController>(
-                        init: BottomNavController(),
-                        builder: (controller) {
-                          return BottomNavigationBar(
-                            //   elevation: 0.0,
-                            currentIndex: controller.selectedPage,
-                            selectedIconTheme: CustomTheme.lightIconTheme,
-                            //  selectedItemColor: Colors.red,
-                            unselectedItemColor: Colors.grey[600],
+              // bottomNavigationBar: AnimatedContainer(
+              //   duration: Duration(milliseconds: 250),
+              //   height: value ? kBottomNavigationBarHeight : 0.0,
+              //   child: Wrap(
+              //     children: <Widget>[
+              //       GetBuilder<BottomNavController>(
+              //           init: BottomNavController(),
+              //           builder: (controller) {
+              //             return BottomNavigationBar(
+              //               //   elevation: 0.0,
+              //               currentIndex: controller.selectedPage,
+              //               selectedIconTheme: CustomTheme.lightIconTheme,
+              //               //  selectedItemColor: Colors.red,
+              //               unselectedItemColor: Colors.grey[600],
 
-                            showSelectedLabels: false,
-                            selectedItemColor: Colors.green,
-                            showUnselectedLabels: false,
+              //               showSelectedLabels: false,
+              //               selectedItemColor: Colors.green,
+              //               showUnselectedLabels: false,
 
-                            type: BottomNavigationBarType.fixed,
-                            items: navItems,
-                            onTap: (index) async {
-                              controller.setPage(index);
+              //               type: BottomNavigationBarType.fixed,
+              //               items: navItems,
+              //               onTap: (index) async {
+              //                 controller.setPage(index);
 
-                              switch (index) {
-                                case 0:
-                                  break;
-                                case 1:
-                                  break;
-                                case 2:
-                                  break;
-                                case 3:
-                                  break;
+              //                 switch (index) {
+              //                   case 0:
+              //                     break;
+              //                   case 1:
+              //                     break;
+              //                   case 2:
+              //                     break;
+              //                   case 3:
+              //                     break;
 
-                                case 4:
-                                  // await Get.to(() => Profile(),
-                                  //     transition: Transition.rightToLeft);
+              //                   case 4:
+              //                     // await Get.to(() => Profile(),
+              //                     //     transition: Transition.rightToLeft);
 
-                                  // controller.setPage(2);
-                                  break;
-                              }
-                            },
-                          );
-                        })
-                  ],
-                ),
-              ),
+              //                     // controller.setPage(2);
+              //                     break;
+              //                 }
+              //               },
+              //             );
+              //           })
+              //     ],
+              //   ),
+              // ),
 
-              floatingActionButton: AnimatedContainer(
-                duration: Duration(milliseconds: 250),
-                height: value ? (kBottomNavigationBarHeight - 15) : 0.0,
-                child: Wrap(
-                  children: <Widget>[
-                    GetBuilder<BottomNavController>(
-                        init: BottomNavController(),
-                        builder: (controller) {
-                          return FloatingActionButton(
-                            backgroundColor: Colors.green[600],
-                            onPressed: () {
-                              controller.setPage(2);
-                              // showToast('Test Mesasge', MessageType.ERROR);
-                              //      showAlert('Test Alert', MessageType.ERROR);
+              // floatingActionButton: AnimatedContainer(
+              //   duration: Duration(milliseconds: 250),
+              //   height: value ? (kBottomNavigationBarHeight - 15) : 0.0,
+              //   child: Wrap(
+              //     children: <Widget>[
+              //       GetBuilder<BottomNavController>(
+              //           init: BottomNavController(),
+              //           builder: (controller) {
+              //             return FloatingActionButton(
+              //               backgroundColor: Colors.green[600],
+              //               onPressed: () {
+              //                 controller.setPage(2);
+              //                 // showToast('Test Mesasge', MessageType.ERROR);
+              //                 //      showAlert('Test Alert', MessageType.ERROR);
 
-                              // Alert.showConfirm(
-                              //     context,
-                              //     'Test Alert',
-                              //     'This is a custom alert message ',
-                              //     MessageType.ERROR,
-                              //     cancelLabel: 'Cancel',
-                              //     confirmLabel: 'Remove');
-                            },
-                            child: Icon(Ionicons.home_outline),
-                          );
-                        })
-                  ],
-                ),
-              ),
+              //                 // Alert.showConfirm(
+              //                 //     context,
+              //                 //     'Test Alert',
+              //                 //     'This is a custom alert message ',
+              //                 //     MessageType.ERROR,
+              //                 //     cancelLabel: 'Cancel',
+              //                 //     confirmLabel: 'Remove');
+              //               },
+              //               child: Icon(Ionicons.home_outline),
+              //             );
+              //           })
+              //     ],
+              //   ),
+              // ),
 
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.centerDocked,
+              // floatingActionButtonLocation:
+              //     FloatingActionButtonLocation.centerDocked,
             );
           },
           valueListenable: hiding.visible,
@@ -286,7 +286,7 @@ class _HomePageState extends State<HomePage> {
 class Home extends StatelessWidget {
   Home({Key? key}) : super(key: key);
   final api = HttpService();
-  var formatter = NumberFormat('#,###,000.00');
+  var formatter = NumberFormat('#,###,##0.00');
 
   final DateFormat formatDate = DateFormat('MMM dd, yyyy hh:mm:ss');
   final List<String> data = [
